@@ -22,6 +22,7 @@ from ..utils.constants import (
 )
 # Fixed imports - use the correct paths to the actual modules
 from ..utils.prompt_library import PromptLibrary
+from ..utils import utils
 from .prompt_list_item import PromptListItem
 from .metadata_dialog import MetadataDialog
 
@@ -233,9 +234,13 @@ class DesignerPrometheusPromptGenerator(QMainWindow):
         """Populate the prompt list with available prompt types."""
         # First clear any existing items
         self.promptList.clear()
+        self.selected_prompts = []  # Reset selected prompts when repopulating
         
         # Get all prompt types from the prompt library
         prompt_types = self.prompt_library.get_types()
+        
+        # Sort prompt types alphabetically for a better UI experience
+        prompt_types.sort()
         
         # Add each prompt type to the list
         for prompt_type in prompt_types:
@@ -249,7 +254,7 @@ class DesignerPrometheusPromptGenerator(QMainWindow):
             
             # Create custom widget for this item
             item_widget = PromptListItem(
-                prompt_type=prompt_type, 
+                prompt_type=prompt_type,  # The exact key from the prompt library
                 display_name=display_name,
                 show_info_icon=True
             )
@@ -257,11 +262,11 @@ class DesignerPrometheusPromptGenerator(QMainWindow):
             # Connect the info button to show metadata
             item_widget.info_clicked.connect(self.show_metadata_dialog)
             
-            # Set size hint for the item based on widget
-            item.setSizeHint(item_widget.sizeHint())
-            
-            # Add widget to the list item
+            # Set the item widget for this list item
             self.promptList.setItemWidget(item, item_widget)
+            
+        # Update the UI to reflect the current selection state
+        self.update_selection_display()
     
     def show_metadata_dialog(self, prompt_type):
         """Show the metadata dialog for a prompt type."""
@@ -286,16 +291,19 @@ class DesignerPrometheusPromptGenerator(QMainWindow):
         """Handle selection of an item in the prompt list."""
         # Get the widget to access the prompt type
         item_widget = self.promptList.itemWidget(item)
-        if item_widget:
-            prompt_type = item_widget.prompt_type
+        if not item_widget:
+            return
             
-            # Toggle selection state
-            if prompt_type in self.selected_prompts:
-                self.selected_prompts.remove(prompt_type)
-                item.setSelected(False)
-            else:
-                self.selected_prompts.append(prompt_type)
-                item.setSelected(True)
+        prompt_type = item_widget.prompt_type
+        
+        # Toggle selection state
+        if prompt_type in self.selected_prompts:
+            self.selected_prompts.remove(prompt_type)
+        else:
+            self.selected_prompts.append(prompt_type)
+        
+        # Update the UI to reflect the selection state
+        self.update_selection_display()
     
     def handle_resize(self):
         """Handle window resize events."""
@@ -315,14 +323,14 @@ class DesignerPrometheusPromptGenerator(QMainWindow):
             item_widget = self.promptList.itemWidget(item)
             if item_widget:
                 self.selected_prompts.append(item_widget.prompt_type)
-                item.setSelected(True)
+        
+        # Update UI to reflect selection state
+        self.update_selection_display()
     
     def select_no_prompts(self):
         """Deselect all prompt types in the list."""
         self.selected_prompts = []
-        for i in range(self.promptList.count()):
-            item = self.promptList.item(i)
-            item.setSelected(False)
+        self.update_selection_display()
     
     def generate_prompts(self):
         """Generate prompts based on selected types and urgency level."""
@@ -334,26 +342,68 @@ class DesignerPrometheusPromptGenerator(QMainWindow):
                 "Please select at least one prompt type."
             )
             return
-        
+            
         # Get urgency level
         urgency_level = self.urgencySlider.value()
         
         # Clear current output
         self.outputText.clear()
         
-        # Generate prompts
-        all_prompts = []
-        for prompt_type in self.selected_prompts:
-            prompt = self.prompt_library.generate_prompt(prompt_type, urgency_level)
-            if prompt:
-                all_prompts.append(prompt)
+        # Track errors to show only one summary dialog at the end
+        errors = []
+        generated_count = 0
         
-        # Join all prompts with newlines and set to output
-        if all_prompts:
-            result = "\n\n".join(all_prompts)
-            self.outputText.setText(result)
+        # Generate prompts
+        generated_texts = []
+        
+        for prompt_type in self.selected_prompts:
+            try:
+                # Get prompt template
+                prompt_data = self.prompt_library.get(prompt_type)
+                
+                if not prompt_data:
+                    errors.append(f"Prompt type '{prompt_type}' not found in library")
+                    continue
+                    
+                template = prompt_data.get("template", "")
+                
+                if not template:
+                    errors.append(f"Template for '{prompt_type}' is empty")
+                    continue
+                
+                # Generate with urgency applied
+                prompt_text = utils.generate_template_with_urgency(template, urgency_level)
+                
+                # Add to results with prompt type as header
+                formatted_prompt = f"### {prompt_data.get('title', prompt_type)} ###\n\n{prompt_text}"
+                generated_texts.append(formatted_prompt)
+                generated_count += 1
+                
+            except Exception as e:
+                errors.append(f"Error generating '{prompt_type}': {str(e)}")
+        
+        # If we generated at least one prompt, show it
+        if generated_texts:
+            # Join all prompts with separator
+            separator = "\n\n" + "-" * 60 + "\n\n"
+            all_prompts = separator.join(generated_texts)
+            
+            # Set the output text
+            self.outputText.setText(all_prompts)
+            
+            # Update status bar
+            if hasattr(self, 'statusbar'):
+                self.statusbar.showMessage(
+                    f"Generated {generated_count} prompt(s) with urgency level {urgency_level}/10", 
+                    3000
+                )
         else:
-            self.outputText.setText("No prompts could be generated. Please check your selections.")
+            self.outputText.setText("No prompts could be generated. Please check the error message.")
+        
+        # If there were errors, show a single error dialog with all issues
+        if errors:
+            error_message = "The following errors occurred:\n\n" + "\n".join(f"• {error}" for error in errors)
+            QMessageBox.warning(self, "Prompt Generation Issues", error_message)
     
     def copy_to_clipboard(self):
         """Copy the generated prompt to the clipboard."""
@@ -436,6 +486,17 @@ class DesignerPrometheusPromptGenerator(QMainWindow):
             "with various urgency levels.</p>"
             "<p>© 2025 Prometheus AI</p>"
         )
+
+    def update_selection_display(self):
+        """Update the UI to reflect the current selection state."""
+        for i in range(self.promptList.count()):
+            item = self.promptList.item(i)
+            item_widget = self.promptList.itemWidget(item)
+            
+            if item_widget and item_widget.prompt_type in self.selected_prompts:
+                item.setSelected(True)
+            else:
+                item.setSelected(False)
 
 
 # Create a version that uses inheritance if UI class is available

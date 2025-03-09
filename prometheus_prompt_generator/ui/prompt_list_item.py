@@ -69,7 +69,11 @@ class PromptListItem(QWidget):
     def updateStyle(self, is_dark_mode, accent_color=None):
         """Update the styling based on the current theme"""
         if accent_color:
-            tag_color = accent_color.name()
+            # Handle both QColor objects and string color values
+            if isinstance(accent_color, QColor):
+                tag_color = accent_color.name()
+            else:
+                tag_color = accent_color  # Already a string
         else:
             tag_color = "#2980b9" if is_dark_mode else "#3498db"
             

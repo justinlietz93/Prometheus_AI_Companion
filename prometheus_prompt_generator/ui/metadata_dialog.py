@@ -16,18 +16,17 @@ from ..utils.constants import DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE, DEFAULT_VE
 class MetadataDialog(QDialog):
     """Dialog to display and edit prompt metadata"""
     
-    def __init__(self, prompt_type, prompt_library, parent=None):
+    def __init__(self, prompt_type, prompt_info, parent=None):
         """Initialize the metadata dialog.
         
         Args:
             prompt_type (str): The type of prompt to edit
-            prompt_library: Reference to the prompt library
+            prompt_info (dict): Prompt information dictionary
             parent (QWidget, optional): Parent widget. Defaults to None.
         """
         super().__init__(parent)
         self.prompt_type = prompt_type
-        self.prompt_library = prompt_library
-        self.prompt_data = prompt_library.get(prompt_type, {})
+        self.prompt_data = prompt_info
         
         self.setWindowTitle(f"Prompt Details: {prompt_type.replace('_', ' ').title()}")
         self.setMinimumWidth(500)  # Slightly wider for better readability
@@ -55,7 +54,10 @@ class MetadataDialog(QDialog):
         self.tags_edit.setFont(QFont(DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE))
         metadata = self.prompt_data.get("metadata", {})
         tags = metadata.get("tags", [])
-        self.tags_edit.setText(", ".join(tags))
+        if isinstance(tags, list):
+            self.tags_edit.setText(", ".join(tags))
+        else:
+            self.tags_edit.setText(str(tags))
         form_layout.addRow("Tags:", self.tags_edit)
         
         # Author
@@ -108,7 +110,7 @@ class MetadataDialog(QDialog):
         self.prompt_data["metadata"]["created"] = self.created_edit.text()
         self.prompt_data["metadata"]["updated"] = self.updated_edit.text()
         
-        # Save the changes back to the library
-        self.prompt_library.save_prompt(self.prompt_type, self.prompt_data)
+        # We're only updating the local prompt_data, not saving to the library here
+        # The caller will need to save this data to the prompt library if needed
             
         super().accept() 
