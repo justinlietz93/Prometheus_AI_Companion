@@ -1,3 +1,4 @@
 PyQt6>=6.8.1 
 qt-material>=2.14
 qdarkstyle>=3.2.3
+PySide6
