@@ -9,11 +9,15 @@ from .tag_controller import TagController
 from .filter_controller import FilterController
 from .advanced_filter_proxy_model import AdvancedFilterProxyModel
 from .scoring_controller import ScoringController
+from .usage_controller import UsageController
+from .benchmark_controller import BenchmarkController
 
 __all__ = [
     "PromptController", 
     "TagController", 
     "FilterController",
     "AdvancedFilterProxyModel",
-    "ScoringController"
+    "ScoringController",
+    "UsageController",
+    "BenchmarkController"
 ] 

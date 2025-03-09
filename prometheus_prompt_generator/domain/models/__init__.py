@@ -11,5 +11,11 @@ from .category import Category
 from .model_factory import ModelFactory
 from .prompt_score import PromptScore
 from .prompt_usage import PromptUsage
+from .model import Model
+from .benchmark import Benchmark
+from .benchmark_result import BenchmarkResult
 
-__all__ = ['Prompt', 'PromptMapper', 'Tag', 'Category', 'ModelFactory', 'PromptScore', 'PromptUsage'] 
+__all__ = [
+    'Prompt', 'PromptMapper', 'Tag', 'Category', 'ModelFactory', 
+    'PromptScore', 'PromptUsage', 'Model', 'Benchmark', 'BenchmarkResult'
+] 
