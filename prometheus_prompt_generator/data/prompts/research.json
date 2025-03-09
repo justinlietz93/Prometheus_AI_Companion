@@ -1,0 +1,26 @@
+{
+  "name": "research",
+  "description": "Research Prompts",
+  "prompts": {
+    "1": "Your role involves exploring ways to enhance system efficiency. A potential area for improvement has been identified. Please consider how to approach this opportunity.",
+    "2": "You are responsible for investigating performance enhancements. A concern has arisen that might benefit from analysis. Take a look and think about possible strategies.",
+    "3": "Your task is to study options for improving system performance. There�s an indication of a gap that could use attention. Review it carefully and plan your next move.",
+    "4": "You need to research ways to boost operational efficiency. A noticeable issue has emerged that may impact performance. Evaluate it soon and consider actions.",
+    "5": "Ensuring system optimization is your focus, and a significant opportunity has surfaced. This could affect overall efficiency. Assess it with care and determine steps.",
+    "6": "Your expertise in research is key to enhancing performance. A pressing matter has arisen that might influence stability. Address it promptly and plan a resolution.",
+    "7": "Maintaining system efficiency through research is critical. A serious gap has been identified that needs immediate review. Act decisively to handle it.",
+    "8": "You are tasked with exploring performance improvements. A critical issue has emerged that could impact operations. Handle it with priority and propose a solution.",
+    "9": "Your role is to ensure research supports system optimization. A major opportunity has surfaced that demands quick action to maximize benefits. Evaluate and respond soon.",
+    "10": "Research is essential for system performance, and a severe challenge has arisen. This requires your immediate focus to prevent significant setbacks. Act now to address it."
+  },
+  "metadata": {
+    "author": "Prometheus AI",
+    "version": "1.0.0",
+    "created": "2025-03-09",
+    "tags": [
+      "ai",
+      "prompt",
+      "research"
+    ]
+  }
+}

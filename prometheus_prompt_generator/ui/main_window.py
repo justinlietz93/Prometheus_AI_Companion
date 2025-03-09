@@ -111,13 +111,17 @@ class PrometheusPromptGenerator(QMainWindow):
         
         # Search input with proper styling
         search_layout = QHBoxLayout()
-        search_label = QLabel("🔍")
-        search_label.setFixedWidth(20)
+        
+        # Create a proper search icon using standard Qt icons instead of emoji
         self.filter_input = QLineEdit()
         self.filter_input.setObjectName("searchInput")
         self.filter_input.setPlaceholderText("Search prompt types...")
         self.filter_input.textChanged.connect(self.filterPrompts)
-        search_layout.addWidget(search_label)
+        
+        # Use standard Qt icon for search - this is the modern approach
+        search_icon = self.style().standardIcon(self.style().StandardPixmap.SP_FileDialogContentsView)
+        self.filter_input.addAction(search_icon, QLineEdit.ActionPosition.LeadingPosition)
+        
         search_layout.addWidget(self.filter_input)
         left_layout.addLayout(search_layout)
         
@@ -184,15 +188,15 @@ class PrometheusPromptGenerator(QMainWindow):
         
         self.urgency_slider = QSlider(Qt.Orientation.Horizontal)
         self.urgency_slider.setMinimum(1)
-        self.urgency_slider.setMaximum(5)
-        self.urgency_slider.setValue(3)
+        self.urgency_slider.setMaximum(10)
+        self.urgency_slider.setValue(5)
         self.urgency_slider.setTickPosition(QSlider.TickPosition.TicksBelow)
         self.urgency_slider.setTickInterval(1)
         self.urgency_slider.setObjectName("urgencySlider")
         self.urgency_slider.valueChanged.connect(self.updateUrgencyDisplay)
         slider_row.addWidget(self.urgency_slider)
         
-        max_label = QLabel("High")
+        max_label = QLabel("Extreme")
         max_label.setObjectName("maxLabel")
         slider_row.addWidget(max_label)
         
@@ -334,7 +338,7 @@ class PrometheusPromptGenerator(QMainWindow):
             
     def updateUrgencyDisplay(self, value):
         """Update the urgency level display"""
-        self.urgency_display.setText(URGENCY_NAMES.get(value, f"Level {value}"))
+        self.urgency_display.setText(URGENCY_NAMES.get(value, f"Level {value}/10"))
             
     def handleItemSelection(self, item):
         """Handle item selection in the prompt list"""
@@ -514,7 +518,7 @@ class PrometheusPromptGenerator(QMainWindow):
             
             if template:
                 # Add prompt header
-                header = f"# {widget.display_name} (Urgency: {urgency_level}/5)\n\n"
+                header = f"# {widget.display_name} (Urgency: {urgency_level}/10)\n\n"
                 
                 # Generate with urgency applied
                 prompt_text = utils.generate_template_with_urgency(template, urgency_level)

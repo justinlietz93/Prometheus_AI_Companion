@@ -9,12 +9,29 @@ in the prompt library directory.
 import os
 import json
 import glob
+import sys
 
 class PromptLibrary:
     """A class for loading and accessing prompts from the prompt library"""
     
-    def __init__(self, library_dir="prompt_library/prompts"):
+    def __init__(self, library_dir=None):
         """Initialize the prompt library with the directory containing prompt files"""
+        # Use the new path structure as the default
+        if library_dir is None:
+            # Try to find the prompts directory in our new structure
+            package_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            new_path = os.path.join(package_dir, "data", "prompts")
+            old_path = os.path.join(os.path.dirname(package_dir), "prompt_library", "prompts")
+            
+            # Use the path that exists
+            if os.path.exists(new_path):
+                library_dir = new_path
+            elif os.path.exists(old_path):
+                library_dir = old_path
+            else:
+                # Default to the new path even if it doesn't exist yet
+                library_dir = new_path
+                
         self.library_dir = library_dir
         self.prompts = {}
         self.load_all_prompts()

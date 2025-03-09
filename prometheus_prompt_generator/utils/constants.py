@@ -47,7 +47,12 @@ DEFAULT_TAGS = ["ai", "prompt"]
 URGENCY_NAMES = {
     1: "Very Low (1)",
     2: "Low (2)",
-    3: "Normal (3)",
-    4: "High (4)",
-    5: "Urgent (5)"
+    3: "Below Normal (3)",
+    4: "Normal (4)",
+    5: "Above Normal (5)",
+    6: "Moderate (6)",
+    7: "High (7)",
+    8: "Very High (8)",
+    9: "Critical (9)",
+    10: "Extreme (10)"
 } 

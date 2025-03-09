@@ -8,18 +8,23 @@ This document outlines the tasks needed to complete the refactoring of the Prome
 - [x] Create UI module structure
 - [x] Create utils module structure
 - [x] Create initial compatibility layer (prompt_generator_qt.py)
-- [ ] Move all utility modules from prompt_library/ to prometheus_prompt_generator/utils
-  - [ ] Evaluate and migrate prompt_loader.py
-  - [ ] Evaluate and migrate prompt_manager.py
-  - [ ] Evaluate and migrate base_prompt.py
-- [ ] Integrate utils/draw_map.py if relevant
-- [ ] Remove duplicate files from root directory
-  - [ ] constants.py
-  - [ ] utils.py
-  - [ ] prompt_library.py
-  - [ ] metadata_dialog.py
-  - [ ] prompt_list_item.py
-  - [ ] main_window.py
+- [x] Move all utility modules from prompt_library/ to prometheus_prompt_generator/utils
+  - [x] Evaluate and migrate prompt_loader.py
+  - [x] Evaluate and migrate prompt_manager.py
+  - [x] Evaluate and migrate base_prompt.py
+- [x] Integrate utils/draw_map.py if relevant
+- [x] Remove duplicate files from root directory
+  - [x] constants.py
+  - [x] utils.py
+  - [x] prompt_library.py
+  - [x] metadata_dialog.py
+  - [x] prompt_list_item.py
+  - [x] main_window.py
+  - [x] script files (standardize_*.py, extract_prompts.py, etc.)
+- [x] Migrate prompt data
+  - [x] Copy prompts directory to prometheus_prompt_generator/data/prompts
+  - [x] Copy rules directory to prometheus_prompt_generator/data/rules
+  - [x] Update prompt loader to use new paths
 
 ## Code Quality
 
@@ -32,9 +37,9 @@ This document outlines the tasks needed to complete the refactoring of the Prome
 ## Documentation
 
 - [x] Update README.md with new structure
-- [ ] Document installation procedure
-- [ ] Document development workflow
-- [ ] Create architecture overview
+- [x] Document installation procedure
+- [x] Document development workflow
+- [x] Create architecture overview
 
 ## Testing
 
@@ -46,6 +51,7 @@ This document outlines the tasks needed to complete the refactoring of the Prome
 ## Improvements
 
 - [ ] Fix QPixmap error in search widget
+- [ ] Review enhancements.txt for further goals
 - [ ] Add consistent icons for buttons and menus
 - [ ] Improve theme handling and customization
 - [ ] Add keyboard shortcuts for common actions

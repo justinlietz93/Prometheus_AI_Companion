@@ -1,0 +1,26 @@
+{
+  "name": "regression_testing",
+  "description": "Regression Testing Prompts",
+  "prompts": {
+    "1": "Your role involves verifying code stability after changes. A potential issue has been noted in recent tests. Please consider how to approach this.",
+    "2": "You are responsible for checking code consistency. A concern has arisen that might need review. Take a look and think about your next steps.",
+    "3": "Your task is to ensure changes don�t break existing functionality. There�s a sign of a problem that could use attention. Review it carefully and plan your response.",
+    "4": "You need to maintain code reliability through testing. A noticeable issue has emerged that may impact stability. Evaluate it soon and consider actions.",
+    "5": "Ensuring regression stability is your focus, and a significant concern has surfaced. This could pose risks. Assess it with care and determine steps.",
+    "6": "Your expertise in regression testing is key to preventing issues. A pressing matter has arisen that might affect reliability. Address it promptly and plan a resolution.",
+    "7": "Maintaining code integrity through regression testing is critical. A serious problem has been identified that needs immediate review. Act decisively to handle it.",
+    "8": "You are tasked with protecting code stability. A critical issue has emerged that could impact the system. Handle it with priority and propose a solution.",
+    "9": "Your role is to ensure regression testing supports system health. A major concern has surfaced that demands quick action to avoid broader effects. Evaluate and respond soon.",
+    "10": "Regression testing is essential for system reliability, and a severe challenge has arisen. This requires your immediate focus to prevent significant disruptions. Act now to address it."
+  },
+  "metadata": {
+    "author": "Prometheus AI",
+    "version": "1.0.0",
+    "created": "2025-03-09",
+    "tags": [
+      "ai",
+      "prompt",
+      "regression_testing"
+    ]
+  }
+}
