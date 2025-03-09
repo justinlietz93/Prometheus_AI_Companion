@@ -26,6 +26,40 @@ This document outlines the tasks needed to complete the refactoring of the Prome
   - [x] Copy rules directory to prometheus_prompt_generator/data/rules
   - [x] Update prompt loader to use new paths
 
+## UI Enhancements
+
+- [x] Fix QPixmap error in search widget
+- [x] Implement 10 levels of urgency in the slider
+- [x] Fix the selector window to show all text and tags
+- [x] Add info icon for metadata display
+- [x] Make editor window editable
+- [x] Clean up generated prompt output
+- [x] Move Generate Prompts button next to Copy to Clipboard
+- [x] Update search icon to modern style
+- [x] Implement overall modern IDE-like UI improvements
+
+## Qt Architecture Improvements
+
+- [x] Create scripts for Qt Designer integration
+  - [x] Create script to generate UI file from current layout
+  - [x] Create example script demonstrating both composition and inheritance approaches
+- [ ] Convert UI to Qt Designer (.ui) files
+  - [ ] Create main window UI in Qt Designer
+  - [ ] Create dialog UIs in Qt Designer 
+  - [ ] Setup pyuic6 conversion process
+- [ ] Implement proper QMainWindow structure
+  - [ ] Refactor menu system using Qt menu standards
+  - [ ] Add proper status bar with context information
+  - [ ] Implement dockable widget areas if needed
+- [ ] Add internationalization support
+  - [ ] Setup pylupdate6 to extract translatable strings
+  - [ ] Create .ts translation files
+  - [ ] Add language switching mechanism
+- [ ] Implement resource management
+  - [ ] Create .qrc resource file for icons and assets
+  - [ ] Setup pyrcc6 conversion process
+  - [ ] Use QResource system for all assets
+
 ## Code Quality
 
 - [ ] Add proper docstrings to all modules
@@ -48,15 +82,15 @@ This document outlines the tasks needed to complete the refactoring of the Prome
 - [ ] Write integration tests for UI components
 - [ ] Ensure tests run on CI pipeline
 
-## Improvements
+## User Experience
 
-- [ ] Fix QPixmap error in search widget
-- [ ] Review enhancements.txt for further goals
-- [ ] Add consistent icons for buttons and menus
-- [ ] Improve theme handling and customization
+- [ ] Add dialog-based help system 
+  - [ ] Implement context-sensitive help using Qt Assistant patterns
+  - [ ] Create comprehensive help documentation
 - [ ] Add keyboard shortcuts for common actions
-- [ ] Add proper logging framework
-- [ ] Add more robust error handling
+- [ ] Implement customizable themes with color selection
+- [ ] Add persistent user settings storage
+- [ ] Implement proper error handling dialogs
 
 ## Release Preparation
 

@@ -22,7 +22,7 @@ from qt_material import apply_stylesheet
 # Import our modules
 from ..utils.constants import (DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE, DEFAULT_HEADING_SIZE,
                               PROMETHEUS_BLUE, PROMETHEUS_LIGHT_BLUE, PROMETHEUS_DARK, 
-                              PROMETHEUS_LIGHT, PROMETHEUS_ACCENT, AVAILABLE_THEMES, URGENCY_NAMES)
+                              PROMETHEUS_LIGHT, PROMETHEUS_ACCENT, AVAILABLE_THEMES, URGENCY_LEVELS)
 from ..utils.prompt_library import PromptLibrary
 from ..utils import utils
 from .prompt_list_item import PromptListItem
@@ -145,19 +145,6 @@ class PrometheusPromptGenerator(QMainWindow):
         self.prompt_list.itemClicked.connect(self.handleItemSelection)
         left_layout.addWidget(self.prompt_list)
         
-        # Description area
-        self.description_label = QLabel("Description")
-        self.description_label.setObjectName("sectionHeader")
-        self.description_label.setFont(QFont(DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE + 1, QFont.Weight.Bold))
-        left_layout.addWidget(self.description_label)
-        
-        self.description_text = QTextEdit()
-        self.description_text.setObjectName("descriptionText")
-        self.description_text.setReadOnly(True)
-        self.description_text.setPlaceholderText("Select a prompt to view its description")
-        self.description_text.setMaximumHeight(100)
-        left_layout.addWidget(self.description_text)
-        
         # Add new prompt button
         add_prompt_btn = QPushButton("Add Custom Prompt")
         add_prompt_btn.setObjectName("addPromptButton")
@@ -203,14 +190,6 @@ class PrometheusPromptGenerator(QMainWindow):
         urgency_layout.addLayout(slider_row)
         right_layout.addLayout(urgency_layout)
         
-        # Button to generate prompts
-        generate_btn = QPushButton("Generate Prompts")
-        generate_btn.setObjectName("generateButton")
-        generate_btn.setFont(QFont(DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE + 2, QFont.Weight.Bold))
-        generate_btn.setMinimumHeight(50)
-        generate_btn.clicked.connect(self.generatePrompts)
-        right_layout.addWidget(generate_btn)
-        
         # Generated prompt section
         generated_header = QLabel("Generated Prompt")
         generated_header.setObjectName("sectionHeader")
@@ -220,15 +199,30 @@ class PrometheusPromptGenerator(QMainWindow):
         # Output area
         self.output_text = QTextEdit()
         self.output_text.setObjectName("outputText")
-        self.output_text.setReadOnly(True)
-        self.output_text.setPlaceholderText("The generated prompt will appear here")
+        self.output_text.setReadOnly(False)
+        self.output_text.setPlaceholderText("The generated prompt will appear here. You can edit it as needed.")
         right_layout.addWidget(self.output_text)
+        
+        # Create a button row for actions
+        button_row = QHBoxLayout()
+        
+        # Generate Prompts button
+        generate_btn = QPushButton("Generate Prompts")
+        generate_btn.setObjectName("generateButton")
+        generate_btn.setFont(QFont(DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE + 1, QFont.Weight.Bold))
+        generate_btn.setMinimumHeight(40)
+        generate_btn.clicked.connect(self.generatePrompts)
+        button_row.addWidget(generate_btn)
         
         # Button to copy to clipboard
         copy_btn = QPushButton("Copy to Clipboard")
         copy_btn.setObjectName("copyButton")
+        copy_btn.setMinimumHeight(40)
         copy_btn.clicked.connect(self.copyToClipboard)
-        right_layout.addWidget(copy_btn)
+        button_row.addWidget(copy_btn)
+        
+        # Add the button row to the right layout
+        right_layout.addLayout(button_row)
         
         # Set the central widget
         self.central_widget.setLayout(main_layout)
@@ -319,8 +313,12 @@ class PrometheusPromptGenerator(QMainWindow):
             # Create list item
             item = QListWidgetItem(self.prompt_list)
             
-            # Create and set custom widget
-            widget = PromptListItem(prompt_type, display_name, parent=self.prompt_list)
+            # Create and set custom widget with info icon
+            widget = PromptListItem(prompt_type, display_name, parent=self.prompt_list, show_info_icon=True)
+            
+            # Connect signals
+            widget.clicked.connect(self.handleItemSelection)
+            widget.info_clicked.connect(self.showMetadataDialog)
             
             # Set item size to match widget
             item.setSizeHint(widget.sizeHint())
@@ -338,11 +336,13 @@ class PrometheusPromptGenerator(QMainWindow):
             
     def updateUrgencyDisplay(self, value):
         """Update the urgency level display"""
-        self.urgency_display.setText(URGENCY_NAMES.get(value, f"Level {value}/10"))
+        self.urgency_display.setText(URGENCY_LEVELS.get(value, f"Level {value}/10"))
             
     def handleItemSelection(self, item):
         """Handle item selection in the prompt list"""
-        self.updateDescription(item)
+        # We removed the brief description, so this method now just
+        # handles the selection of an item in the prompt list
+        pass
         
     def handleResize(self):
         """Handle window resize events"""
@@ -352,8 +352,8 @@ class PrometheusPromptGenerator(QMainWindow):
     def resizeEvent(self, event):
         """Override resize event to emit a custom signal"""
         super().resizeEvent(event)
-        self.resized.emit() 
-
+        self.resized.emit()
+        
     def createMenuBar(self):
         """Create the menu bar with all menu items"""
         # Main menu bar
@@ -517,14 +517,11 @@ class PrometheusPromptGenerator(QMainWindow):
             template = prompt_data.get("template", "")
             
             if template:
-                # Add prompt header
-                header = f"# {widget.display_name} (Urgency: {urgency_level}/10)\n\n"
-                
-                # Generate with urgency applied
+                # Generate with urgency applied (clean output without metadata)
                 prompt_text = utils.generate_template_with_urgency(template, urgency_level)
                 
-                # Add to results
-                generated_prompts.append(header + prompt_text)
+                # Add to results (without metadata header)
+                generated_prompts.append(prompt_text)
         
         # Join all prompts with separator
         separator = "\n\n" + "-" * 40 + "\n\n"
@@ -691,60 +688,6 @@ class PrometheusPromptGenerator(QMainWindow):
         self.settings.sync()
         event.accept()
         
-    def updateDescription(self, item):
-        """Update the description area based on the selected prompt"""
-        if not item:
-            self.description_text.clear()
-            return
-            
-        widget = self.prompt_list.itemWidget(item)
-        prompt_type = widget.prompt_type
-        
-        # Get prompt data
-        prompt_data = self.prompt_library.get(prompt_type)
-        
-        if not prompt_data:
-            self.description_text.clear()
-            return
-            
-        # Get description and metadata
-        description = prompt_data.get("description", "")
-        metadata = prompt_data.get("metadata", {})
-        
-        # Format metadata
-        metadata_text = ""
-        if metadata:
-            author = metadata.get("author", "")
-            version = metadata.get("version", "")
-            if author or version:
-                metadata_text = f"\n\nBy: {author} (v{version})"
-            
-            tags = metadata.get("tags", [])
-            if tags:
-                metadata_text += f"\nTags: {', '.join(tags)}"
-        
-        # Set description text
-        self.description_text.setText(description + metadata_text)
-        
-        # Show edit button for the metadata
-        self.description_text.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.description_text.customContextMenuRequested.connect(
-            lambda pos, pt=prompt_type: self.showContextMenu(pos, pt))
-            
-    def showContextMenu(self, pos, prompt_type):
-        """Show context menu for the description text"""
-        context_menu = QMenu(self)
-        
-        edit_action = QAction("Edit Metadata", self)
-        edit_action.triggered.connect(lambda: self.showMetadataDialog(prompt_type))
-        context_menu.addAction(edit_action)
-        
-        delete_action = QAction("Delete Prompt", self)
-        delete_action.triggered.connect(lambda: self.deletePrompt(prompt_type))
-        context_menu.addAction(delete_action)
-        
-        context_menu.exec(self.description_text.mapToGlobal(pos))
-        
     def deletePrompt(self, prompt_type):
         """Delete a prompt from the library"""
         response = QMessageBox.question(self, "Confirm Delete", 
@@ -754,4 +697,25 @@ class PrometheusPromptGenerator(QMainWindow):
         if response == QMessageBox.StandardButton.Yes:
             self.prompt_library.delete_prompt(prompt_type)
             self.refreshPromptList()
-            self.statusBar().showMessage(f"Deleted prompt: {prompt_type}", 3000) 
+            self.statusBar().showMessage(f"Deleted prompt: {prompt_type}", 3000)
+        
+    def showMetadataDialog(self, prompt_type):
+        """Show dialog to view/edit prompt metadata"""
+        dialog = MetadataDialog(prompt_type, self.prompt_library, parent=self)
+        if dialog.exec():
+            # Refresh the prompt list to show any updates
+            self.populatePromptList()
+            
+    def updateUrgencyDisplay(self, value):
+        """Update the urgency level display"""
+        self.urgency_display.setText(URGENCY_LEVELS.get(value, f"Level {value}/10"))
+            
+    def handleResize(self):
+        """Handle window resize events"""
+        # Adjust UI elements based on window size
+        pass
+        
+    def resizeEvent(self, event):
+        """Override resize event to emit a custom signal"""
+        super().resizeEvent(event)
+        self.resized.emit() 

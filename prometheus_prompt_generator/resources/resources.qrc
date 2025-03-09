@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RCC>
+    <qresource prefix="/icons">
+        <file alias="app_icon.png">icons/app_icon.png</file>
+        <file alias="search.png">icons/search.png</file>
+        <file alias="info.png">icons/info.png</file>
+        <file alias="copy.png">icons/copy.png</file>
+        <file alias="generate.png">icons/generate.png</file>
+        <file alias="add.png">icons/add.png</file>
+        <file alias="import.png">icons/import.png</file>
+        <file alias="export.png">icons/export.png</file>
+        <file alias="settings.png">icons/settings.png</file>
+        <file alias="dark_theme.png">icons/dark_theme.png</file>
+        <file alias="light_theme.png">icons/light_theme.png</file>
+    </qresource>
+    <qresource prefix="/translations">
+        <file alias="prometheus_en.qm">translations/prometheus_en.qm</file>
+        <file alias="prometheus_es.qm">translations/prometheus_es.qm</file>
+        <file alias="prometheus_fr.qm">translations/prometheus_fr.qm</file>
+        <file alias="prometheus_de.qm">translations/prometheus_de.qm</file>
+    </qresource>
+    <qresource prefix="/styles">
+        <file alias="dark_blue.qss">styles/dark_blue.qss</file>
+        <file alias="light.qss">styles/light.qss</file>
+    </qresource>
+</RCC> 

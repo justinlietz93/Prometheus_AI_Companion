@@ -4,95 +4,84 @@ Prometheus AI Prompt List Item
 A custom widget for displaying prompt items in a list widget.
 """
 
-from PyQt6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel
-from PyQt6.QtGui import QFont, QPalette, QColor
-from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QSizePolicy, QToolButton
+from PyQt6.QtGui import QFont, QPalette, QColor, QIcon, QPixmap
+from PyQt6.QtCore import Qt, pyqtSignal, QSize
 
 from ..utils.constants import DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE
 
 class PromptListItem(QWidget):
     """Custom widget for displaying prompt types in the list"""
     
-    def __init__(self, prompt_type, display_name, parent=None):
+    clicked = pyqtSignal(str)
+    info_clicked = pyqtSignal(str)  # Signal now includes the prompt_type
+    
+    def __init__(self, prompt_type, display_name, parent=None, show_info_icon=False):
         """Initialize the prompt list item widget.
         
         Args:
             prompt_type (str): The type/identifier of the prompt
             display_name (str): The display name to show to the user
             parent (QWidget, optional): Parent widget. Defaults to None.
+            show_info_icon (bool, optional): Whether to show an info icon. Defaults to False.
         """
         super().__init__(parent)
         self.prompt_type = prompt_type
         self.display_name = display_name
+        self.show_info_icon = show_info_icon
         
-        # Create layout
+        self.initUI()
+        
+    def initUI(self):
+        """Initialize the user interface"""
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(5, 8, 5, 8)
+        layout.setContentsMargins(5, 2, 5, 2)
         layout.setSpacing(5)
         
-        # Create item layout for better spacing
-        self.item_layout = QVBoxLayout()
-        
-        # Main prompt name label
-        self.name_label = QLabel(display_name)
+        # Name label
+        self.name_label = QLabel(self.display_name)
         self.name_label.setObjectName("promptName")
-        self.name_label.setFont(QFont(DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE, QFont.Weight.Bold))
-        
-        # Type label (smaller, right-aligned)
-        self.type_label = QLabel(prompt_type)
-        self.type_label.setObjectName("promptType")
-        self.type_label.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.type_label.setFont(QFont(DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE - 1))
-        
-        # Add labels to layout
+        self.name_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        self.name_label.setToolTip(self.display_name)  # Add tooltip to show full text on hover
         layout.addWidget(self.name_label)
-        layout.addStretch()
-        layout.addWidget(self.type_label)
         
-        # Set styling for selected state
-        self.setAutoFillBackground(True)
-        self.updateStyle(True)  # Default to dark mode
-    
+        # Type tag (prompt_type as a colored tag)
+        self.type_tag = QLabel(self.prompt_type)
+        self.type_tag.setObjectName("promptTypeTag")
+        self.type_tag.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.type_tag.setMaximumWidth(100)
+        self.type_tag.setMinimumWidth(80)
+        self.type_tag.setStyleSheet("background-color: #2980b9; color: white; border-radius: 10px; padding: 2px 5px;")
+        self.type_tag.setToolTip(f"Type: {self.prompt_type}")  # Add tooltip to tag
+        layout.addWidget(self.type_tag)
+        
+        # Add info icon if requested
+        if self.show_info_icon:
+            self.info_button = QToolButton()
+            self.info_button.setIcon(self.style().standardIcon(self.style().StandardPixmap.SP_MessageBoxInformation))
+            self.info_button.setToolTip("View metadata")
+            self.info_button.setMaximumSize(QSize(20, 20))
+            self.info_button.clicked.connect(self.onInfoClicked)
+            layout.addWidget(self.info_button)
+        
+        self.setLayout(layout)
+        
     def updateStyle(self, is_dark_mode, accent_color=None):
-        """Update the styling based on dark/light mode and accent color.
-        
-        Args:
-            is_dark_mode (bool): Whether the app is in dark mode
-            accent_color (QColor, optional): Accent color to use. Defaults to None.
-        """
-        if accent_color is None:
-            accent_color = QColor("#2980b9")  # Default blue
-            
-        # Create palettes for normal and selected states
-        normal_palette = self.palette()
-        selected_palette = QPalette(normal_palette)
-        
-        if is_dark_mode:
-            # Dark mode
-            normal_palette.setColor(QPalette.ColorRole.Window, QColor(51, 51, 51))
-            normal_palette.setColor(QPalette.ColorRole.WindowText, QColor(255, 255, 255))
-            
-            # Selected state - use accent color
-            selected_palette.setColor(QPalette.ColorRole.Window, accent_color.darker(110))
-            selected_palette.setColor(QPalette.ColorRole.WindowText, QColor(255, 255, 255))
-            
-            # Type label
-            self.type_label.setStyleSheet(f"color: rgba(255, 255, 255, 180);")
+        """Update the styling based on the current theme"""
+        if accent_color:
+            tag_color = accent_color.name()
         else:
-            # Light mode
-            normal_palette.setColor(QPalette.ColorRole.Window, QColor(240, 240, 240))
-            normal_palette.setColor(QPalette.ColorRole.WindowText, QColor(0, 0, 0))
+            tag_color = "#2980b9" if is_dark_mode else "#3498db"
             
-            # Selected state - use accent color
-            selected_palette.setColor(QPalette.ColorRole.Window, accent_color.lighter(140))
-            selected_palette.setColor(QPalette.ColorRole.WindowText, QColor(0, 0, 0))
+        self.type_tag.setStyleSheet(f"background-color: {tag_color}; color: white; border-radius: 10px; padding: 2px 5px;")
             
-            # Type label
-            self.type_label.setStyleSheet(f"color: rgba(0, 0, 0, 180);")
+    def mousePressEvent(self, event):
+        """Handle mouse press events"""
+        self.clicked.emit(self.prompt_type)
+        # Allow event to propagate for selection
+        super().mousePressEvent(event)
         
-        # Store palettes for use when selection state changes
-        self.normal_palette = normal_palette
-        self.selected_palette = selected_palette
-        
-        # Apply initial palette
-        self.setPalette(normal_palette) 
+    def onInfoClicked(self):
+        """Handle info icon click"""
+        # This will be connected to the metadata dialog
+        self.info_clicked.emit(self.prompt_type) 
