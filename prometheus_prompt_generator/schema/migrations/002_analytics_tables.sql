@@ -49,7 +49,8 @@ CREATE TABLE ReportingMetrics (
   timestamp TEXT,                -- When recorded
   value REAL,                    -- Metric value
   dimension TEXT,                -- Category, tag, etc.
-  dimension_value TEXT           -- Specific dimension value
+  dimension_value TEXT,          -- Specific dimension value
+  UNIQUE(metric_type, metric_name, timestamp, dimension, dimension_value)
 );
 
 -- Performance indices for analytics tables
@@ -109,7 +110,7 @@ BEGIN
     WHERE id = NEW.category_id;
 END;
 
--- Create reporting metrics function
+-- Record reporting metrics function
 CREATE TRIGGER record_daily_metrics
 AFTER INSERT ON PromptUsage
 BEGIN
