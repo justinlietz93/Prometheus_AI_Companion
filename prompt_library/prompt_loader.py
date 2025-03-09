@@ -92,13 +92,14 @@ class PromptLibrary:
         metadata = self.get_prompt_metadata(prompt_type)
         return metadata.get("tags", [])
         
-    def add_custom_prompt(self, prompt_type, description, prompts=None):
+    def add_custom_prompt(self, prompt_type, description, prompts=None, metadata=None):
         """Add a custom prompt to the library
         
         Args:
             prompt_type (str): The type/name of the prompt
             description (str): The description of the prompt
             prompts (dict, optional): Dictionary of prompts by level. Defaults to a basic template.
+            metadata (dict, optional): Metadata for the prompt. Defaults to basic metadata.
             
         Returns:
             bool: True if prompt was added successfully, False otherwise
@@ -111,15 +112,25 @@ class PromptLibrary:
                 "10": f"Comprehensive {prompt_type} prompt with maximum detail and urgency."
             }
             
+        # Create default metadata if none provided
+        if metadata is None:
+            import datetime
+            today = datetime.datetime.now().strftime("%Y-%m-%d")
+            metadata = {
+                "custom": True,
+                "tags": ["custom"],
+                "author": "User",
+                "version": "1.0.0",
+                "created": today,
+                "updated": today
+            }
+            
         # Create the prompt data structure
         prompt_data = {
             "name": prompt_type,
             "description": description,
             "prompts": prompts,
-            "metadata": {
-                "custom": True,
-                "tags": ["custom"]
-            }
+            "metadata": metadata
         }
         
         # Add to in-memory prompts
