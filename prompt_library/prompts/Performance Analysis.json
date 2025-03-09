@@ -1,0 +1,16 @@
+{
+  "title": "Performance Analysis Prompt",
+  "description": "A analytical prompt for evaluating system or process",
+  "template": "Conduct a thorough performance analysis of {system_or_process}. Your analysis should:\n\n1. Identify performance bottlenecks\n2. Measure key performance indicators\n3. Compare against industry benchmarks\n4. Recommend optimization strategies\n5. Prioritize improvements by impact and effort\n\nProvide quantitative data where possible and justify your recommendations.",
+  "metadata": {
+    "author": "Prometheus AI",
+    "version": "1.0.0",
+    "created": "2025-03-09",
+    "updated": "2025-03-09",
+    "tags": [
+      "analysis",
+      "performance",
+      "optimization"
+    ]
+  }
+}
