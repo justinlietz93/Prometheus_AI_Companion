@@ -14,6 +14,7 @@ This document provides a quick overview of all the standards documentation avail
 | [Separation_of_Concerns.md](./Separation_of_Concerns.md) | Maintaining clear boundaries | UI layer, service layer, domain layer, data layer, infrastructure layer |
 | [Code_Style_Guide.md](./Code_Style_Guide.md) | Coding conventions | Naming, formatting, documentation, error handling, testing |
 | [Database_Standards.md](./Database_Standards.md) | Database design and access | Schema design, migrations, queries, repositories, security |
+| [UI_Standards.md](./UI_Standards.md) | User interface guidelines | Qt components, layout practices, MVVM implementation, accessibility |
 
 ## Standards Quick Reference
 
@@ -41,6 +42,16 @@ This document provides a quick overview of all the standards documentation avail
 - **Protected Members**: Prefix with `_` (e.g., `_validate_data`)
 - **Private Members**: Prefix with `__` (e.g., `__apply_business_rules`)
 - **Database Tables**: `PascalCase` for tables, `snake_case` for columns
+
+### UI Guidelines
+
+- **Layout Management**: Use layout managers instead of absolute positioning
+- **Component Hierarchy**: Follow Qt's parent-child relationship model
+- **Design Patterns**: Implement MVVM pattern for UI/business logic separation
+- **Spacing**: Consistent spacing (8px, 16px, 24px, 32px)
+- **Color Palette**: Use established color palette (Prometheus Red: #DC3545)
+- **Validation**: Provide inline validation with clear error messages
+- **Accessibility**: Ensure keyboard navigation and screen reader support
 
 ### Documentation Requirements
 
@@ -81,5 +92,6 @@ When adding new code to the project, follow these steps:
 | Date | Changes |
 |------|---------|
 | 2025-03-09 | Initial creation of all standards documentation |
+| 2025-03-09 | Added UI Standards document |
 
 Last updated: March 9, 2025 

@@ -66,6 +66,7 @@ This project follows a comprehensive set of development standards to ensure code
 - [Separation of Concerns](./STANDARDS/Separation_of_Concerns.md): Component responsibilities and boundaries
 - [Code Style Guide](./STANDARDS/Code_Style_Guide.md): Coding conventions and formatting
 - [Database Standards](./STANDARDS/Database_Standards.md): Database design and usage
+- [UI Standards](./STANDARDS/UI_Standards.md): Qt components and user interface guidelines
 - [Standards Summary](./STANDARDS/Standards_Summary.md): Quick reference to all standards
 
 For new contributors, please review these standards before submitting changes to the codebase.
