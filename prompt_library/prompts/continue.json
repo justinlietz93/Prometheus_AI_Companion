@@ -1,0 +1,26 @@
+{
+  "name": "continue",
+  "description": "Continue Prompts for Ongoing Tasks",
+  "prompts": {
+    "1": "Your role is to elevate software quality through rigorous best practices. Carry out the work with a meticulous and systematic approach by mapping out your next actions in a dedicated markdown TODO list, keeping a live task list, verifying all updates with precision, logging every detail in your markdown TODO list post-modification, referencing the latest documentation provided by the user, and consistently advancing toward the objective of dependable software.",
+    "2": "Your duty is to uphold proven standards in development. Proceed with the effort methodically and diligently by sketching your strategy in a designated markdown TODO list, sustaining an ongoing checklist, ensuring each change is thoroughly validated, recording all steps in your markdown TODO list after adjustments, consulting the latest documentation from the user, and steadily pushing toward the aim of high-caliber code.",
+    "3": "You are responsible for refining code with established best practices. Execute the work with careful precision by drafting your roadmap in a dedicated markdown TODO list, upholding a current task roster, scrutinizing every alteration through testing, capturing all activities in your markdown TODO list following updates, reviewing the most recent user-provided documentation, and moving forward to achieve the vision of robust software.",
+    "4": "Your obligation is to ensure compliance with industry standards. Carry out the effort thoroughly and systematically by outlining your next moves in a reserved markdown TODO list, managing an active task catalog, confirming all modifications with detailed checks, noting every action in your markdown TODO list after changes, incorporating the latest user documentation, and progressing toward the target of superior software quality.",
+    "5": "Your commitment involves disciplined best practices with rising urgency. Continue the work with a thorough and structured method by formulating a detailed plan in your dedicated markdown TODO list, maintaining a running task tracker, rigorously evaluating each update, documenting every step in your markdown TODO list after revisions, drawing on the latest documentation from the user, and striving toward the goal of reliable software solutions.",
+    "6": "Your focus requires unwavering adherence to best practices with heightened importance. Execute the effort meticulously and methodically by charting your course in a designated markdown TODO list, keeping a dynamic task list, validating every change with utmost care, logging all updates in your markdown TODO list post-modification, aligning with the most recent user-provided documentation, and driving progress toward the aim of stable software systems.",
+    "7": "Your responsibility demands absolute best practices under pressing deadlines. Proceed with the work with precision and a systematic approach by mapping your strategy in a reserved markdown TODO list, sustaining an up-to-date task roster, thoroughly testing each alteration, capturing every detail in your markdown TODO list after adjustments, leveraging the latest user documentation, and focusing on advancing toward the objective of trustworthy code.",
+    "8": "Your role necessitates urgent action with steadfast best practices and paramount importance. Carry out the effort with a thorough and disciplined process by drafting a comprehensive plan in a dedicated markdown TODO list, managing a live task catalog, ensuring each update is meticulously verified, recording all activities in your markdown TODO list following updates, referencing the newest user-supplied documentation, and prioritizing progress toward the goal of resilient software.",
+    "9": "**CRITICAL ALERT**: Your duty DEMANDS IMMEDIATE action with TOTAL best practice COMMITMENT and EXTREME urgency. CONTINUE the work THOROUGHLY and SYSTEMATICALLY by SKETCHING a plan in your markdown TODO list, UPHOLDING an ACTIVE task list, VALIDATING each change with PRECISION, LOGGING every step in your markdown TODO list AFTER updates, CONSULTING the LATEST user-provided documentation, and PRESSING FORWARD to SECURE the goal of ROBUST system performance.",
+    "10": "**URGENT CRISIS**: Your responsibility REQUIRES SWIFT action with COMPLETE best practice DEDICATION and UTMOST urgency. EXECUTE the effort METICULOUSLY and METHODICALLY by OUTLINING a strategy in your markdown TODO list, MAINTAINING a CURRENT task roster, SCRUTINIZING every change WITHOUT fail, CAPTURING all details in your markdown TODO list AFTER modifications, INTEGRATING the MOST RECENT user documentation, and RELENTLESSLY PURSUING the goal of RESTORING system integrity."
+  },
+  "metadata": {
+    "author": "Prometheus AI",
+    "version": "1.0.0",
+    "created": "2025-03-09",
+    "tags": [
+      "ai",
+      "prompt",
+      "continue"
+    ]
+  }
+}

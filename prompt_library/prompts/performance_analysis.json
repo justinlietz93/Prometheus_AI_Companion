@@ -1,0 +1,26 @@
+{
+  "name": "performance_analysis",
+  "description": "Performance Analysis Prompts",
+  "prompts": {
+    "1": "Your role involves assessing system efficiency. A potential area of concern has been identified. Please consider how to evaluate this aspect.",
+    "2": "You are responsible for reviewing system performance. A concern has arisen that might need analysis. Take a look and think about possible insights.",
+    "3": "Your task is to examine system responsiveness. There�s an indication of an issue that could use attention. Review it carefully and plan your approach.",
+    "4": "You need to analyze system speed and efficiency. A noticeable problem has emerged that may impact operations. Evaluate it soon and consider actions.",
+    "5": "Ensuring optimal performance is your focus, and a significant issue has surfaced. This could affect system reliability. Assess it with care and determine steps.",
+    "6": "Your expertise in performance analysis is key to maintaining efficiency. A pressing matter has arisen that might influence stability. Address it promptly and plan a resolution.",
+    "7": "Maintaining system performance through analysis is critical. A serious concern has been identified that needs immediate review. Act decisively to handle it.",
+    "8": "You are tasked with improving system efficiency. A critical issue has emerged that could impact operations. Handle it with priority and propose a solution.",
+    "9": "Your role is to ensure performance analysis supports system health. A major problem has surfaced that demands quick action to avoid broader effects. Evaluate and respond soon.",
+    "10": "Performance analysis is essential for system reliability, and a severe challenge has arisen. This requires your immediate focus to prevent significant disruptions. Act now to address it."
+  },
+  "metadata": {
+    "author": "Prometheus AI",
+    "version": "1.0.0",
+    "created": "2025-03-09",
+    "tags": [
+      "ai",
+      "prompt",
+      "performance_analysis"
+    ]
+  }
+}
