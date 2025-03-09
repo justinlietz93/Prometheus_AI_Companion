@@ -11,6 +11,7 @@ from .advanced_filter_proxy_model import AdvancedFilterProxyModel
 from .scoring_controller import ScoringController
 from .usage_controller import UsageController
 from .benchmark_controller import BenchmarkController
+from .generation_controller import GenerationController
 
 __all__ = [
     "PromptController", 
@@ -19,5 +20,6 @@ __all__ = [
     "AdvancedFilterProxyModel",
     "ScoringController",
     "UsageController",
-    "BenchmarkController"
+    "BenchmarkController",
+    "GenerationController"
 ] 
