@@ -1,151 +1,157 @@
-# Prometheus AI Prompt Generator - Data Models
+# Prometheus AI Prompt Generator - Domain Models
 
-This directory contains the model classes that represent the domain entities of the Prometheus AI Prompt Generator. These models are implemented as PyQt6 QObject subclasses to support two-way data binding with the UI components.
+This directory contains the domain model classes for the Prometheus AI Prompt Generator. These models encapsulate the business logic and data structures used throughout the application.
 
-## Key Models
+## Model Classes
 
 ### Prompt
 
-The `Prompt` class represents an AI prompt in the system. It includes:
+The `Prompt` class represents an AI prompt in the system. It includes the following key features:
 
-- Core prompt data (title, content, description)
-- Status flags (`is_public`, `is_featured`, `is_custom`)
-- Metadata (creation date, modification date)
-- Tag associations
-- CRUD operations with database integration
-- Data validation
+- CRUD operations for prompts
+- Rich metadata (title, description, creation date, etc.)
+- Category assignment
+- Tag management
+- Full validation
+- Signal-based error notification
 
-**Basic Usage:**
-
+**Usage Example:**
 ```python
 # Create a new prompt
 prompt = Prompt()
-prompt.title = "My Test Prompt"
-prompt.content = "This is a test prompt for {{context}}"
-prompt.description = "A simple test prompt"
-prompt.is_public = True
-prompt.save()  # Saves to database
-
-# Load an existing prompt
-prompt = Prompt(prompt_id=123)
-
-# Modify a prompt
-prompt.title = "Updated Title"
+prompt.title = "Python Code Assistant"
+prompt.content = "Write a Python function that..."
+prompt.description = "Helps with Python coding tasks"
+prompt.category_id = 1
 prompt.save()
 
-# Delete a prompt
-prompt.delete()
-
-# Working with tags
-tag_ids = [1, 2, 3]
-for tag_id in tag_ids:
-    prompt.add_tag(tag_id)
-prompt.save()
-```
-
-### PromptMapper
-
-The `PromptMapper` class connects `Prompt` models to UI form widgets, handling two-way data binding and validation. It:
-
-- Automatically updates the model when UI controls change
-- Updates UI controls when model data changes
-- Handles error display
-- Manages form submission and reset
-
-**Basic Usage:**
-
-```python
-# Create a form mapper (assuming an existing UI form with widgets)
-form_widgets = {
-    'title': self.titleLineEdit,
-    'content': self.contentTextEdit,
-    'description': self.descriptionTextEdit,
-    'is_public': self.isPublicCheckBox,
-    'is_featured': self.isFeaturedCheckBox,
-    'is_custom': self.isCustomCheckBox,
-    'category': self.categoryComboBox,
-    'created_date': self.createdDateLabel,
-    'modified_date': self.modifiedDateLabel,
-    'tags': self.tagsWidget,
-    'error_label': self.errorLabel
-}
-mapper = PromptMapper(prompt, form_widgets)
-
-# Submit the form (saves to database)
-if mapper.submit():
-    self.accept()
-else:
-    # Validation failed, error will be displayed in error_label
-
-# Reset the form to original values
-mapper.reset()
-
-# Clean up connections when done
-mapper.disconnect()
+# Add tags to the prompt
+prompt.add_tag(1)  # Add tag with ID 1
 ```
 
 ### Tag
 
-The `Tag` class represents a tag used to categorize prompts. It includes:
+The `Tag` class represents a label that can be applied to prompts for organization and filtering. It includes:
 
-- Basic tag data (name, color, description)
-- CRUD operations with database integration
-- Duplicate name validation
+- CRUD operations for tags
+- Name, color, and description properties
+- Association with prompts
+- Validation to prevent duplicates
 - Referential integrity checking
 
-**Basic Usage:**
-
+**Usage Example:**
 ```python
 # Create a new tag
 tag = Tag()
-tag.name = "Python"
-tag.color = "#3776AB"  # Python blue
-tag.description = "Code examples in Python"
+tag.name = "python"
+tag.color = "#3776AB"
+tag.description = "Python programming language"
 tag.save()
 
-# Load an existing tag
-tag = Tag(tag_id=5)
-
-# Modify a tag
-tag.color = "#4B8BBE"  # Different shade of Python blue
-tag.save()
-
-# Delete a tag (if not in use)
-tag.delete()
-
-# Get all tags as a list
-all_tags = Tag.get_all_tags()
-
-# Search for tags
-python_tags = Tag.search_tags("python")
+# Get prompts associated with this tag
+prompt_ids = tag.get_associated_prompts()
 ```
 
-## Design Principles
+### Category
 
-These models follow several key design principles:
+The `Category` class represents a hierarchical organization structure for prompts. It includes:
 
-1. **Data Validation**: All models include comprehensive validation to ensure data integrity.
-2. **Signals and Slots**: Models use Qt's signal/slot mechanism for change notification.
-3. **Separation of Concerns**: Models handle business logic and persistence separately from UI.
-4. **Internationalization**: All user-facing messages use the `tr()` function for translation.
-5. **ACID Compliance**: All database operations use transactions to ensure consistency.
-6. **Error Handling**: Comprehensive error handling with meaningful messages.
+- CRUD operations for categories
+- Hierarchical structure (parent-child relationships)
+- Navigation methods (get_parent, get_children)
+- Path management (ancestors, descendants)
+- Circular reference prevention
+- Display ordering
 
-## Implementation Notes
+**Usage Example:**
+```python
+# Create a parent category
+parent = Category()
+parent.name = "Programming"
+parent.description = "Programming related prompts"
+parent.save()
 
-- All database access uses parameterized queries to prevent SQL injection.
-- Models use transactions for operations that affect multiple tables.
-- Changes to model properties emit the `changed` signal to notify observers.
-- Validation errors emit the `error` signal with a descriptive message.
-- Successful save operations emit the `saved` signal.
+# Create a child category
+child = Category()
+child.name = "Python"
+child.description = "Python programming prompts"
+child.parent_id = parent.id
+child.save()
 
-## Creating New Models
+# Get full path
+path = child.get_full_path()  # Returns "Programming > Python"
+```
 
-When creating new model classes, follow these guidelines:
+### ModelFactory
 
-1. Inherit from `QObject` to support signals and properties
-2. Use `pyqtProperty`, `pyqtSignal`, and `pyqtSlot` decorators
-3. Implement validation in a `validate()` method
-4. Use transactions for complex operations
-5. Emit appropriate signals for state changes
-6. Include proper documentation 
+The `ModelFactory` class provides an abstraction layer for creating Qt SQL models that can be directly bound to UI components. It includes:
+
+- Methods to create QSqlTableModel and QSqlRelationalTableModel instances
+- Support for various tables (Prompts, Tags, Categories, etc.)
+- Automatic relation setup
+- Filtering capabilities
+- Hierarchical view creation for categories
+- Error handling with signal emission
+
+**Usage Example:**
+```python
+# Create a factory
+factory = ModelFactory()
+
+# Get a model for tags that can be bound to a view
+tag_model = factory.create_tag_model()
+
+# Get a filtered model
+filtered_model = factory.create_filtered_model("Tags", "name LIKE '%python%'")
+
+# Create a hierarchical category model for a tree view
+category_model = factory.create_hierarchical_category_model()
+```
+
+### PromptScore
+
+The `PromptScore` class is an analytics model that tracks and analyzes prompt performance metrics. It includes:
+
+- Usage tracking (total, success, failure counts)
+- Performance metrics (success rate, token usage, cost)
+- User satisfaction ratings
+- Temporal analysis (trends over time)
+- Comparative ranking
+- Aggregation methods for analytics dashboards
+
+**Usage Example:**
+```python
+# Load a prompt's score metrics
+score = PromptScore(prompt_id=123)
+
+# Record a new usage
+score.record_usage(
+    success=True,
+    tokens_used=500,
+    cost=0.05,
+    satisfaction=4.5
+)
+
+# Get usage trend for last 30 days
+trend_data = score.get_usage_trend(days=30)
+
+# Get comparative ranking
+rank_info = score.get_comparative_rank()
+print(f"This prompt ranks #{rank_info['usage_rank']} in usage")
+
+# Get top prompts by satisfaction
+top_prompts = PromptScore.get_top_prompts(limit=5, metric="satisfaction")
+```
+
+## Implementation Details
+
+All models follow a consistent architecture:
+
+- Qt signals for error notification
+- Private attributes with property accessors
+- Full validation
+- Database operations through QSqlQuery
+- Clear separation of concerns
+- Comprehensive error handling
+
+Database connections are managed externally and injected where needed. 
