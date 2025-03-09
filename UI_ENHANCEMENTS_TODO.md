@@ -10,10 +10,10 @@ This document outlines the specific UI improvements needed, based on the request
 
 ## 2. Implement 10 Levels of Urgency
 
-- [ ] Update constants.py to define 10 urgency levels
-- [ ] Modify the urgency slider to support 10 levels (min=1, max=10)
-- [ ] Update the urgency display formatting to show "/10"
-- [ ] Test slider functionality with all levels
+- [x] Update constants.py to define 10 urgency levels
+- [x] Modify the urgency slider to support 10 levels (min=1, max=10)
+- [x] Update the urgency display formatting to show "/10"
+- [x] Test slider functionality with all levels
 
 ## 3. Fix Selector Window to Show All Text and Tags
 

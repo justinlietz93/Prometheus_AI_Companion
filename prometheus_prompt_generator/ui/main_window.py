@@ -534,7 +534,7 @@ class PrometheusPromptGenerator(QMainWindow):
         self.output_text.setText(all_prompts)
         
         # Update status
-        self.statusBar().showMessage(f"Generated {len(selected_items)} prompt(s) with urgency level {urgency_level}", 3000)
+        self.statusBar().showMessage(f"Generated {len(selected_items)} prompt(s) with urgency level {urgency_level}/10", 3000)
         
     def copyToClipboard(self):
         """Copy the generated prompt to clipboard"""
