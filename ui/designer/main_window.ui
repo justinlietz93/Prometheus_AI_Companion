@@ -1,0 +1,988 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1200</width>
+    <height>800</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>900</width>
+    <height>600</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Prometheus AI Prompt Generator</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../resources/images/prometheus_icon.png</normaloff>../resources/images/prometheus_icon.png</iconset>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="spacing">
+     <number>8</number>
+    </property>
+    <property name="leftMargin">
+     <number>8</number>
+    </property>
+    <property name="topMargin">
+     <number>8</number>
+    </property>
+    <property name="rightMargin">
+     <number>8</number>
+    </property>
+    <property name="bottomMargin">
+     <number>8</number>
+    </property>
+    <item>
+     <widget class="QSplitter" name="mainSplitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="childrenCollapsible">
+       <bool>false</bool>
+      </property>
+      <widget class="QWidget" name="leftPanelContainer" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>250</width>
+         <height>0</height>
+        </size>
+       </property>
+       <layout class="QVBoxLayout" name="leftPanelLayout">
+        <property name="spacing">
+         <number>8</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QTabWidget" name="navigationTabs">
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="promptLibraryTab">
+           <attribute name="title">
+            <string>Prompts</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="promptLibraryLayout">
+            <item>
+             <layout class="QHBoxLayout" name="searchLayout">
+              <item>
+               <widget class="QLineEdit" name="searchInput">
+                <property name="placeholderText">
+                 <string>Search prompts...</string>
+                </property>
+                <property name="clearButtonEnabled">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QTreeView" name="promptTreeView">
+              <property name="editTriggers">
+               <set>QAbstractItemView::NoEditTriggers</set>
+              </property>
+              <property name="alternatingRowColors">
+               <bool>true</bool>
+              </property>
+              <property name="selectionMode">
+               <enum>QAbstractItemView::ExtendedSelection</enum>
+              </property>
+              <property name="sortingEnabled">
+               <bool>true</bool>
+              </property>
+              <attribute name="headerVisible">
+               <bool>true</bool>
+              </attribute>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="promptActionsLayout">
+              <item>
+               <widget class="QPushButton" name="addPromptButton">
+                <property name="text">
+                 <string>New</string>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>../resources/images/add.png</normaloff>../resources/images/add.png</iconset>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="editPromptButton">
+                <property name="text">
+                 <string>Edit</string>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>../resources/images/edit.png</normaloff>../resources/images/edit.png</iconset>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="deletePromptButton">
+                <property name="text">
+                 <string>Delete</string>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>../resources/images/delete.png</normaloff>../resources/images/delete.png</iconset>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="categoriesTab">
+           <attribute name="title">
+            <string>Categories</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="categoriesLayout">
+            <item>
+             <widget class="QTreeView" name="categoryTreeView">
+              <property name="editTriggers">
+               <set>QAbstractItemView::NoEditTriggers</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="categoryButtonsLayout">
+              <item>
+               <widget class="QPushButton" name="addCategoryButton">
+                <property name="text">
+                 <string>Add</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="editCategoryButton">
+                <property name="text">
+                 <string>Edit</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="deleteCategoryButton">
+                <property name="text">
+                 <string>Delete</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tagsTab">
+           <attribute name="title">
+            <string>Tags</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="tagsLayout">
+            <item>
+             <widget class="QListView" name="tagListView"/>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="tagButtonsLayout">
+              <item>
+               <widget class="QPushButton" name="addTagButton">
+                <property name="text">
+                 <string>Add</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="editTagButton">
+                <property name="text">
+                 <string>Edit</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="deleteTagButton">
+                <property name="text">
+                 <string>Delete</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QSplitter" name="contentSplitter">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="childrenCollapsible">
+        <bool>false</bool>
+       </property>
+       <widget class="QWidget" name="editorContainer" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>200</height>
+         </size>
+        </property>
+        <layout class="QVBoxLayout" name="editorLayout">
+         <property name="spacing">
+          <number>8</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QGroupBox" name="promptEditorGroup">
+           <property name="title">
+            <string>Prompt Editor</string>
+           </property>
+           <layout class="QVBoxLayout" name="promptEditorLayout">
+            <item>
+             <layout class="QHBoxLayout" name="promptTitleLayout">
+              <item>
+               <widget class="QLabel" name="titleLabel">
+                <property name="text">
+                 <string>Title:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="titleInput">
+                <property name="placeholderText">
+                 <string>Enter prompt title...</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QTextEdit" name="promptContentEdit">
+              <property name="placeholderText">
+               <string>Enter prompt content here...</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="promptControlsLayout">
+              <item>
+               <widget class="QPushButton" name="savePromptButton">
+                <property name="text">
+                 <string>Save</string>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>../resources/images/save.png</normaloff>../resources/images/save.png</iconset>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="generateButton">
+                <property name="text">
+                 <string>Generate</string>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>../resources/images/generate.png</normaloff>../resources/images/generate.png</iconset>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="clearButton">
+                <property name="text">
+                 <string>Clear</string>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>../resources/images/clear.png</normaloff>../resources/images/clear.png</iconset>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="metadataButton">
+                <property name="text">
+                 <string>Metadata</string>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>../resources/images/metadata.png</normaloff>../resources/images/metadata.png</iconset>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QTabWidget" name="outputTabs">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>150</height>
+         </size>
+        </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="generatedOutputTab">
+         <attribute name="title">
+          <string>Generated Output</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="generatedOutputLayout">
+          <item>
+           <widget class="QTextEdit" name="generatedOutputEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+            <property name="placeholderText">
+             <string>Generated prompt output will appear here...</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="outputControlsLayout">
+            <item>
+             <widget class="QPushButton" name="copyOutputButton">
+              <property name="text">
+               <string>Copy to Clipboard</string>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>../resources/images/copy.png</normaloff>../resources/images/copy.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="exportOutputButton">
+              <property name="text">
+               <string>Export</string>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>../resources/images/export.png</normaloff>../resources/images/export.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="analyticsTab">
+         <attribute name="title">
+          <string>Analytics</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="analyticsLayout">
+          <item>
+           <widget class="QLabel" name="analyticsPlaceholder">
+            <property name="text">
+             <string>Analytics dashboard will be implemented here.</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1200</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionNew"/>
+    <addaction name="actionOpen"/>
+    <addaction name="actionSave"/>
+    <addaction name="actionSaveAs"/>
+    <addaction name="separator"/>
+    <addaction name="actionImport"/>
+    <addaction name="actionExport"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionUndo"/>
+    <addaction name="actionRedo"/>
+    <addaction name="separator"/>
+    <addaction name="actionCut"/>
+    <addaction name="actionCopy"/>
+    <addaction name="actionPaste"/>
+    <addaction name="separator"/>
+    <addaction name="actionFind"/>
+    <addaction name="actionReplace"/>
+    <addaction name="separator"/>
+    <addaction name="actionPreferences"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <widget class="QMenu" name="menuTheme">
+     <property name="title">
+      <string>Theme</string>
+     </property>
+     <addaction name="actionLightTheme"/>
+     <addaction name="actionDarkTheme"/>
+     <addaction name="actionSystemTheme"/>
+    </widget>
+    <addaction name="actionShowToolbar"/>
+    <addaction name="actionShowStatusBar"/>
+    <addaction name="separator"/>
+    <addaction name="actionFullScreen"/>
+    <addaction name="separator"/>
+    <addaction name="menuTheme"/>
+    <addaction name="actionFontSettings"/>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionBenchmark"/>
+    <addaction name="actionAnalytics"/>
+    <addaction name="separator"/>
+    <addaction name="actionBatchProcess"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionDocumentation"/>
+    <addaction name="actionTutorial"/>
+    <addaction name="separator"/>
+    <addaction name="actionAbout"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuView"/>
+   <addaction name="menuTools"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <property name="windowTitle">
+    <string>Main Toolbar</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::TopToolBarArea</set>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>24</width>
+     <height>24</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionNew"/>
+   <addaction name="actionOpen"/>
+   <addaction name="actionSave"/>
+   <addaction name="separator"/>
+   <addaction name="actionGeneratePrompt"/>
+   <addaction name="actionBenchmark"/>
+   <addaction name="separator"/>
+   <addaction name="actionPreferences"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QDockWidget" name="propertiesDock">
+   <property name="windowTitle">
+    <string>Properties</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="propertiesContainer">
+    <layout class="QVBoxLayout" name="propertiesLayout">
+     <item>
+      <widget class="QScrollArea" name="propertiesScrollArea">
+       <property name="widgetResizable">
+        <bool>true</bool>
+       </property>
+       <widget class="QWidget" name="scrollAreaWidgetContents">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>356</width>
+          <height>704</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QGroupBox" name="promptPropertiesGroup">
+           <property name="title">
+            <string>Prompt Properties</string>
+           </property>
+           <layout class="QFormLayout" name="promptPropertiesForm">
+            <item row="0" column="0">
+             <widget class="QLabel" name="categoryLabel">
+              <property name="text">
+               <string>Category:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="categoryCombo"/>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="tagsLabel">
+              <property name="text">
+               <string>Tags:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLineEdit" name="tagsInput">
+              <property name="placeholderText">
+               <string>Enter tags separated by commas</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="modelLabel">
+              <property name="text">
+               <string>Model:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QComboBox" name="modelCombo"/>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="toneLabel">
+              <property name="text">
+               <string>Tone:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QComboBox" name="toneCombo"/>
+            </item>
+            <item row="4" column="0">
+             <widget class="QLabel" name="complexityLabel">
+              <property name="text">
+               <string>Complexity:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QSlider" name="complexitySlider">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="tickPosition">
+               <enum>QSlider::TicksBelow</enum>
+              </property>
+              <property name="tickInterval">
+               <number>1</number>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="0">
+             <widget class="QLabel" name="creativityLabel">
+              <property name="text">
+               <string>Creativity:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="1">
+             <widget class="QSlider" name="creativitySlider">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="tickPosition">
+               <enum>QSlider::TicksBelow</enum>
+              </property>
+              <property name="tickInterval">
+               <number>1</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="variablesGroup">
+           <property name="title">
+            <string>Variables</string>
+           </property>
+           <layout class="QVBoxLayout" name="variablesLayout">
+            <item>
+             <widget class="QTableView" name="variablesTable"/>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="variableButtonsLayout">
+              <item>
+               <widget class="QPushButton" name="addVariableButton">
+                <property name="text">
+                 <string>Add</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="deleteVariableButton">
+                <property name="text">
+                 <string>Delete</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <action name="actionNew">
+   <property name="icon">
+    <iconset>
+     <normaloff>../resources/images/new.png</normaloff>../resources/images/new.png</iconset>
+   </property>
+   <property name="text">
+    <string>New</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="actionOpen">
+   <property name="icon">
+    <iconset>
+     <normaloff>../resources/images/open.png</normaloff>../resources/images/open.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="icon">
+    <iconset>
+     <normaloff>../resources/images/save.png</normaloff>../resources/images/save.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionSaveAs">
+   <property name="text">
+    <string>Save As...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
+   </property>
+  </action>
+  <action name="actionImport">
+   <property name="icon">
+    <iconset>
+     <normaloff>../resources/images/import.png</normaloff>../resources/images/import.png</iconset>
+   </property>
+   <property name="text">
+    <string>Import...</string>
+   </property>
+  </action>
+  <action name="actionExport">
+   <property name="icon">
+    <iconset>
+     <normaloff>../resources/images/export.png</normaloff>../resources/images/export.png</iconset>
+   </property>
+   <property name="text">
+    <string>Export...</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+F4</string>
+   </property>
+  </action>
+  <action name="actionUndo">
+   <property name="text">
+    <string>Undo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
+  </action>
+  <action name="actionRedo">
+   <property name="text">
+    <string>Redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Y</string>
+   </property>
+  </action>
+  <action name="actionCut">
+   <property name="text">
+    <string>Cut</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
+  </action>
+  <action name="actionCopy">
+   <property name="text">
+    <string>Copy</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="actionPaste">
+   <property name="text">
+    <string>Paste</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
+   </property>
+  </action>
+  <action name="actionFind">
+   <property name="text">
+    <string>Find</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionReplace">
+   <property name="text">
+    <string>Replace</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+H</string>
+   </property>
+  </action>
+  <action name="actionPreferences">
+   <property name="icon">
+    <iconset>
+     <normaloff>../resources/images/settings.png</normaloff>../resources/images/settings.png</iconset>
+   </property>
+   <property name="text">
+    <string>Preferences</string>
+   </property>
+  </action>
+  <action name="actionLightTheme">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Light</string>
+   </property>
+  </action>
+  <action name="actionDarkTheme">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Dark</string>
+   </property>
+  </action>
+  <action name="actionSystemTheme">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>System</string>
+   </property>
+  </action>
+  <action name="actionShowToolbar">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Toolbar</string>
+   </property>
+  </action>
+  <action name="actionShowStatusBar">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Status Bar</string>
+   </property>
+  </action>
+  <action name="actionFullScreen">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Full Screen</string>
+   </property>
+   <property name="shortcut">
+    <string>F11</string>
+   </property>
+  </action>
+  <action name="actionFontSettings">
+   <property name="text">
+    <string>Font Settings</string>
+   </property>
+  </action>
+  <action name="actionBenchmark">
+   <property name="icon">
+    <iconset>
+     <normaloff>../resources/images/benchmark.png</normaloff>../resources/images/benchmark.png</iconset>
+   </property>
+   <property name="text">
+    <string>Benchmark</string>
+   </property>
+  </action>
+  <action name="actionAnalytics">
+   <property name="icon">
+    <iconset>
+     <normaloff>../resources/images/analytics.png</normaloff>../resources/images/analytics.png</iconset>
+   </property>
+   <property name="text">
+    <string>Analytics</string>
+   </property>
+  </action>
+  <action name="actionBatchProcess">
+   <property name="text">
+    <string>Batch Process</string>
+   </property>
+  </action>
+  <action name="actionDocumentation">
+   <property name="text">
+    <string>Documentation</string>
+   </property>
+   <property name="shortcut">
+    <string>F1</string>
+   </property>
+  </action>
+  <action name="actionTutorial">
+   <property name="text">
+    <string>Tutorial</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionGeneratePrompt">
+   <property name="icon">
+    <iconset>
+     <normaloff>../resources/images/generate.png</normaloff>../resources/images/generate.png</iconset>
+   </property>
+   <property name="text">
+    <string>Generate</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui> 

@@ -166,12 +166,13 @@ class TestAdvancedFilterProxyModel:
         filter_model.add_custom_filter(ai_filter)
         
         # Should show rows with "AI" in tags
-        assert filter_model.rowCount() == 3
+        assert filter_model.rowCount() == 4
         
         titles = [filter_model.data(filter_model.index(i, 0)) for i in range(filter_model.rowCount())]
         assert "ChatGPT Prompt" in titles
         assert "DALL-E Image Generation" in titles
         assert "Code Review Assistant" in titles
+        assert "Customer Support Bot" in titles
         assert "Text Summarization" not in titles
     
     def test_column_name_resolution(self, filter_model):

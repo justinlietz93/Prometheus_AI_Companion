@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'C:\github\prompts\prometheus_prompt_generator\ui\designer\main_window.ui'
+# Form implementation generated from reading ui file 'C:\git\Prometheus_AI_Companion\prometheus_prompt_generator\ui\designer\main_window.ui'
 #
 # Created by: PyQt6 UI code generator 6.8.1
 #

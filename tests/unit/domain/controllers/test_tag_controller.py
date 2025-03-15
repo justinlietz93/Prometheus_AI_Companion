@@ -382,4 +382,271 @@ class TestTagController:
         # Verify
         assert isinstance(new_tag, Tag)
         assert new_tag.id is None
-        assert new_tag.name == "" 
+        assert new_tag.name == ""
+        
+    def test_save_tag_empty_name(self, controller, repository):
+        """Test saving a tag with an empty name."""
+        # Setup
+        tag = Tag()
+        tag._name = ""  # Empty name to trigger validation error
+        
+        # Register signal spy
+        error_signal_received = False
+        error_message = None
+        saved_signal_received = False
+        
+        def on_operation_error(message):
+            nonlocal error_signal_received, error_message
+            error_signal_received = True
+            error_message = message
+            
+        def on_tag_saved(tag):
+            nonlocal saved_signal_received
+            saved_signal_received = True
+            
+        controller.operationError.connect(on_operation_error)
+        controller.tagSaved.connect(on_tag_saved)
+        
+        # Execute
+        controller.save_tag(tag)
+        
+        # Verify
+        assert error_signal_received
+        assert "Tag name cannot be empty" in error_message
+        assert not saved_signal_received
+        assert not repository.save_called
+        
+    def test_delete_tag_not_found(self, controller, repository):
+        """Test deleting a non-existent tag."""
+        # Setup - repository is empty
+        
+        # Register signal spy
+        error_signal_received = False
+        error_message = None
+        deleted_signal_received = False
+        
+        def on_operation_error(message):
+            nonlocal error_signal_received, error_message
+            error_signal_received = True
+            error_message = message
+            
+        def on_tag_deleted(tag_id):
+            nonlocal deleted_signal_received
+            deleted_signal_received = True
+            
+        controller.operationError.connect(on_operation_error)
+        controller.tagDeleted.connect(on_tag_deleted)
+        
+        # Execute
+        controller.delete_tag(999)  # Non-existent ID
+        
+        # Verify
+        assert error_signal_received
+        assert "not found" in error_message
+        assert not deleted_signal_received
+        
+    def test_delete_tag_failure(self, controller, repository, sample_tag):
+        """Test deleting a tag with a repository failure."""
+        # Setup
+        repository.tags[1] = sample_tag
+        # Make delete return False to simulate failure
+        repository.delete = MagicMock(return_value=False)
+        
+        # Register signal spy
+        error_signal_received = False
+        error_message = None
+        
+        def on_operation_error(message):
+            nonlocal error_signal_received, error_message
+            error_signal_received = True
+            error_message = message
+            
+        controller.operationError.connect(on_operation_error)
+        
+        # Execute
+        controller.delete_tag(1)
+        
+        # Verify
+        assert error_signal_received
+        assert "Failed to delete tag with ID" in error_message
+        
+    def test_filter_tags_error(self, controller, repository):
+        """Test filtering tags with an error."""
+        # Setup
+        repository.error_on_filter = True
+        
+        # Register signal spy
+        error_signal_received = False
+        error_message = None
+        
+        def on_operation_error(message):
+            nonlocal error_signal_received, error_message
+            error_signal_received = True
+            error_message = message
+            
+        controller.operationError.connect(on_operation_error)
+        
+        # Execute
+        controller.filter_tags(name="Test")
+        
+        # Verify
+        assert repository.filter_called
+        assert error_signal_received
+        assert "Failed to filter tags" in error_message
+        
+    def test_multi_select_tags(self, controller, repository, sample_tag):
+        """Test selecting multiple tags."""
+        # Setup
+        tag1 = sample_tag
+        tag2 = Tag()
+        tag2._id = 2
+        tag2._name = "Second Tag"
+        tag2._color = "#33FF57"
+        
+        repository.tags[1] = tag1
+        repository.tags[2] = tag2
+        
+        # Register signal spy
+        selection_changed_received = False
+        selected_tags = None
+        
+        def on_selection_changed(tags):
+            nonlocal selection_changed_received, selected_tags
+            selection_changed_received = True
+            selected_tags = tags
+            
+        controller.selectionChanged.connect(on_selection_changed)
+        
+        # Execute
+        controller.multi_select_tags([1, 2])
+        
+        # Verify
+        assert selection_changed_received
+        assert len(selected_tags) == 2
+        assert controller.current_tag.id == 1  # First tag is current
+        assert controller.selected_tags[0].id == 1
+        assert controller.selected_tags[1].id == 2
+        
+    def test_multi_select_tags_none_found(self, controller, repository):
+        """Test selecting multiple tags when none exist."""
+        # Setup - repository is empty
+        
+        # Register signal spy
+        selection_changed_received = False
+        selected_tags = None
+        
+        def on_selection_changed(tags):
+            nonlocal selection_changed_received, selected_tags
+            selection_changed_received = True
+            selected_tags = tags
+            
+        controller.selectionChanged.connect(on_selection_changed)
+        
+        # Execute
+        controller.multi_select_tags([1, 2])
+        
+        # Verify
+        assert selection_changed_received
+        assert len(selected_tags) == 0
+        assert controller.current_tag is None
+        
+    def test_multi_select_tags_error(self, controller, repository):
+        """Test selecting multiple tags with an error."""
+        # Setup
+        repository.get_by_id = MagicMock(side_effect=Exception("Database error"))
+        
+        # Register signal spy
+        error_signal_received = False
+        error_message = None
+        
+        def on_operation_error(message):
+            nonlocal error_signal_received, error_message
+            error_signal_received = True
+            error_message = message
+            
+        controller.operationError.connect(on_operation_error)
+        
+        # Execute
+        controller.multi_select_tags([1, 2])
+        
+        # Verify
+        assert error_signal_received
+        assert "Failed to select tags" in error_message
+        
+    def test_search_tags_empty_term(self, controller, repository, sample_tag):
+        """Test searching tags with an empty search term."""
+        # Setup
+        repository.tags[1] = sample_tag
+        controller._all_tags = [sample_tag]
+        
+        # Execute
+        results = controller.search_tags("")
+        
+        # Verify
+        assert len(results) == 1
+        assert results[0].id == 1
+        
+    def test_search_tags_matching(self, controller, repository, sample_tag):
+        """Test searching tags with a matching term."""
+        # Setup
+        repository.tags[1] = sample_tag
+        controller._all_tags = [sample_tag]
+        
+        # Execute
+        results = controller.search_tags("Test")
+        
+        # Verify
+        assert len(results) == 1
+        assert results[0].id == 1
+        
+    def test_search_tags_no_match(self, controller, repository, sample_tag):
+        """Test searching tags with no matches."""
+        # Setup
+        repository.tags[1] = sample_tag
+        controller._all_tags = [sample_tag]
+        
+        # Execute
+        results = controller.search_tags("NonExistent")
+        
+        # Verify
+        assert len(results) == 0
+        
+    def test_search_tags_case_insensitive(self, controller, repository, sample_tag):
+        """Test searching tags with case-insensitive matching."""
+        # Setup
+        repository.tags[1] = sample_tag
+        controller._all_tags = [sample_tag]
+        
+        # Execute
+        results = controller.search_tags("test")  # lowercase, original is "Test Tag"
+        
+        # Verify
+        assert len(results) == 1
+        assert results[0].id == 1
+        
+    def test_search_tags_error(self, controller, repository):
+        """Test searching tags with an error."""
+        # Setup
+        # Create a mock that raises an exception when accessed
+        mock_all_tags = MagicMock()
+        mock_all_tags.__iter__ = MagicMock(side_effect=Exception("Database error"))
+        controller._all_tags = mock_all_tags
+        
+        # Register signal spy
+        error_signal_received = False
+        error_message = None
+        
+        def on_operation_error(message):
+            nonlocal error_signal_received, error_message
+            error_signal_received = True
+            error_message = message
+            
+        controller.operationError.connect(on_operation_error)
+        
+        # Execute
+        results = controller.search_tags("Test")
+        
+        # Verify
+        assert error_signal_received
+        assert "Failed to search tags" in error_message
+        assert len(results) == 0 

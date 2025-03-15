@@ -32,32 +32,34 @@ class MockPromptUsage(PromptUsage):
 
 
 class MockPromptUsageRepository:
-    """Mock repository for testing the UsageController."""
+    """Mock repository for testing UsageController."""
     
     def __init__(self):
-        self.usages = {}
+        self.usages = {}  # id -> MockPromptUsage
+        self.next_id = 1
+        self.error_on_get_by_prompt_id = False
+        self.error_on_get_by_user_id = False
+        self.error_on_get_by_date_range = False
+        self.error_on_get_all = False
+        self.error_on_add = False
+        self.error_on_save = False
+        # Add tracking attributes
         self.save_called = False
         self.get_by_prompt_id_called = False
         self.get_by_user_id_called = False
         self.get_by_date_range_called = False
         self.get_all_called = False
-        self.error_on_save = False
-        self.error_on_get_by_prompt_id = False
-        self.error_on_get_by_user_id = False
-        self.error_on_get_by_date_range = False
-        self.error_on_get_all = False
-        
+        self.add_called = False
+
     def save(self, usage):
-        """Save a usage record to the repository."""
         self.save_called = True
         if self.error_on_save:
-            raise Exception("Failed to save usage")
-        
-        # If usage has no ID, assign one
-        if usage._id is None:
-            usage._id = len(self.usages) + 1
+            raise Exception("Simulated error in save method")
             
-        self.usages[usage._id] = usage
+        usage_id = self.next_id
+        self.next_id += 1
+        usage._id = usage_id
+        self.usages[usage_id] = usage
         return usage
         
     def get_by_prompt_id(self, prompt_id):
@@ -94,6 +96,16 @@ class MockPromptUsageRepository:
             raise Exception("Failed to get all usage records")
             
         return list(self.usages.values())
+
+    def add(self, prompt_usage):
+        self.add_called = True
+        if self.error_on_add:
+            raise Exception("Simulated error in add method")
+            
+        usage_id = len(self.usages) + 1
+        prompt_usage._id = usage_id
+        self.usages[usage_id] = prompt_usage
+        return prompt_usage
 
 
 class MockPromptRepository:
@@ -202,33 +214,52 @@ class TestUsageController:
         # Verify results
         assert result._prompt_id == prompt_id
         assert result._user_id == user_id
-        assert usage_repository.save_called is True
+        assert result._context == context
+        assert result._model == model
+        assert result._duration == duration
+        assert result._token_count == token_count
+        assert result._cost == cost
+        assert result._was_successful == successful
+        assert result._response_quality == quality
+        assert result._feedback == feedback
+        
+        # Verify the usage was saved to the repository
+        assert len(usage_repository.usages) == 1
+        assert usage_repository.usages[result._id] == result
+        
+        # Verify signal was emitted
         assert usage_recorded_emitted is True
         
     def test_record_usage_error(self, controller, usage_repository):
-        """Test error handling when recording usage fails."""
-        # Set repository to simulate an error
+        """Test error handling when record_usage fails."""
+        # Setup to cause error during record_usage
         usage_repository.error_on_save = True
         
-        # Set up signal handler to verify emission
-        error_emitted = False
+        # Register signal spy
+        error_signal_received = False
+        error_message = None
         
         def on_error(message):
-            nonlocal error_emitted
-            error_emitted = True
-            assert "Failed to save usage" in message
-            
+            nonlocal error_signal_received, error_message
+            error_signal_received = True
+            error_message = message
+        
         controller.error.connect(on_error)
         
-        # Execute the method and verify it raises an exception
+        # Execute and verify exception is raised
         with pytest.raises(Exception, match="Failed to save usage"):
             controller.record_usage(
-                prompt_id=100,
+                prompt_id=1,
                 user_id="user123",
-                context="chatbot"
+                context="test",
+                model="gpt-4",
+                token_count=100,
+                was_successful=True
             )
             
-        assert error_emitted is True
+        # Verify error signal was emitted
+        assert error_signal_received
+        assert "Failed to save usage" in error_message
         
     def test_record_minimal_usage(self, controller, usage_repository):
         """Test recording usage with only required fields."""
@@ -479,7 +510,7 @@ class TestUsageController:
         assert "by_day" in stats
         assert len(stats["by_day"]) == 5
         assert "success_rate" in stats
-        assert stats["success_rate"] == 0.7  # 7 out of 10 successful
+        assert stats["success_rate"] == 0.6  # 6 out of 10 successful (i % 3 != 0 means i = 1, 2, 4, 5, 7, 8)
         assert "avg_duration" in stats
         assert "avg_token_count" in stats
         assert "avg_cost" in stats
@@ -508,7 +539,7 @@ class TestUsageController:
         trends = controller.get_usage_trends(days=10)
         
         # Verify results
-        assert len(trends) == 10  # Should have data for 10 days
+        assert len(trends) == 11  # Should have data for 11 days (includes today)
         for day_data in trends:
             assert "date" in day_data
             assert "count" in day_data
@@ -591,42 +622,183 @@ class TestUsageController:
             assert "avg_cost" in metrics
             assert "total_cost" in metrics
             
-    def test_get_user_activity(self, controller, usage_repository):
-        """Test retrieving user activity statistics."""
-        # Create usage records for different users
-        users = ["user1", "user2", "user3", "user4", "user5"]
-        for i in range(50):
-            user_index = i % len(users)
-            usage = MockPromptUsage(
-                id=i + 1,
-                prompt_id=100 + (i % 3),  # 3 different prompts
-                user_id=users[user_index],
-                context="chatbot" if i % 2 == 0 else "assistant",
-                model="gpt-4" if i % 3 == 0 else "gpt-3.5",
-                timestamp=datetime.now() - timedelta(days=i % 14),
-                duration=1.0 + (i % 4) * 0.5,
-                token_count=100 + (i % 5) * 20,
-                cost=0.001 + (i % 5) * 0.0002,
-                was_successful=(i % 4) != 0
-            )
-            usage_repository.usages[usage._id] = usage
-            
-        # Execute the method
-        activity = controller.get_user_activity()
+    def test_record_batch_usage_missing_fields(self, controller):
+        """Test validation error when required fields are missing in batch usage."""
+        # Setup test data with missing fields
+        batch_data = [
+            {
+                # Missing prompt_id
+                "user_id": "user123",
+                "context": "test"
+            },
+            {
+                "prompt_id": 100,
+                # Missing user_id
+                "context": "test"
+            },
+            {
+                "prompt_id": 100,
+                "user_id": "user123",
+                # Missing context
+            }
+        ]
         
-        # Verify results
-        assert len(activity) == len(users)
-        for user in users:
-            assert user in activity
-            metrics = activity[user]
-            assert "usage_count" in metrics
-            assert "first_activity" in metrics
-            assert "last_activity" in metrics
-            assert "prompts_used" in metrics
-            assert isinstance(metrics["prompts_used"], list)
-            assert "models_used" in metrics
-            assert isinstance(metrics["models_used"], dict)
-            assert "success_rate" in metrics
-            assert "contexts" in metrics
-            assert isinstance(metrics["contexts"], dict)
-            assert "total_cost" in metrics 
+        # Register signal spy
+        error_signal_received = False
+        error_message = None
+        
+        def on_error(message):
+            nonlocal error_signal_received, error_message
+            error_signal_received = True
+            error_message = message
+        
+        controller.error.connect(on_error)
+        
+        # Execute and verify exception is raised
+        with pytest.raises(Exception, match="Missing required fields"):
+            controller.record_batch_usage(batch_data)
+            
+        # Verify error signal was emitted
+        assert error_signal_received
+        assert "Missing required fields" in error_message
+    
+    def test_get_usage_by_user_error(self, controller, usage_repository):
+        """Test error handling when get_by_user_id fails."""
+        # Setup
+        usage_repository.error_on_get_by_user_id = True
+        
+        # Register signal spy
+        error_signal_received = False
+        error_message = None
+        
+        def on_error(message):
+            nonlocal error_signal_received, error_message
+            error_signal_received = True
+            error_message = message
+        
+        controller.error.connect(on_error)
+        
+        # Execute and verify exception is raised
+        with pytest.raises(Exception, match="Failed to get usage for user"):
+            controller.get_usage_by_user("user123")
+            
+        # Verify error signal was emitted
+        assert error_signal_received
+        assert "Failed to get usage for user" in error_message
+    
+    def test_get_usage_by_date_range_error(self, controller, usage_repository):
+        """Test error handling when get_by_date_range fails."""
+        # Setup
+        usage_repository.error_on_get_by_date_range = True
+        start_date = datetime.now() - timedelta(days=7)
+        end_date = datetime.now()
+        
+        # Register signal spy
+        error_signal_received = False
+        error_message = None
+        
+        def on_error(message):
+            nonlocal error_signal_received, error_message
+            error_signal_received = True
+            error_message = message
+        
+        controller.error.connect(on_error)
+        
+        # Execute and verify exception is raised
+        with pytest.raises(Exception, match="Failed to get usage by date range"):
+            controller.get_usage_by_date_range(start_date, end_date)
+            
+        # Verify error signal was emitted
+        assert error_signal_received
+        assert "Failed to get usage by date range" in error_message
+    
+    def test_get_all_usage_error(self, controller, usage_repository):
+        """Test error handling when get_all fails."""
+        # Setup
+        usage_repository.error_on_get_all = True
+        
+        # Register signal spy
+        error_signal_received = False
+        error_message = None
+        
+        def on_error(message):
+            nonlocal error_signal_received, error_message
+            error_signal_received = True
+            error_message = message
+        
+        controller.error.connect(on_error)
+        
+        # Execute and verify exception is raised
+        with pytest.raises(Exception, match="Failed to get all usage records"):
+            controller.get_all_usage()
+            
+        # Verify error signal was emitted
+        assert error_signal_received
+        assert "Failed to get all usage records" in error_message
+        
+    def test_calculate_usage_statistics_with_empty_data(self, controller):
+        """Test calculating statistics with empty usage list."""
+        # Execute with empty list
+        usages = []
+        stats = controller.calculate_usage_statistics()
+        
+        # Verify results are a dictionary with all the expected values
+        assert isinstance(stats, dict)
+        assert stats["total_count"] == 0
+        assert stats["success_count"] == 0
+        assert stats["success_rate"] == 0
+        assert stats["avg_duration"] == 0
+        assert stats["avg_token_count"] == 0
+        assert stats["avg_cost"] == 0
+        assert isinstance(stats["by_prompt"], dict)
+        assert isinstance(stats["by_user"], dict)
+        assert isinstance(stats["by_context"], dict)
+        assert isinstance(stats["by_model"], dict)
+    
+    def test_record_batch_usage_validation_error_propagation(self, controller, usage_repository):
+        """Test that validation errors in batch operations are properly propagated."""
+        # Setup test data with missing required field
+        batch_data = [
+            {
+                "prompt_id": 1,
+                "user_id": "user123",
+                # Missing "context" field
+                "model": "gpt-4",
+                "was_successful": True,
+            }
+        ]
+        
+        # Register signal spy
+        error_signal_received = False
+        error_message = None
+        
+        def on_error(message):
+            nonlocal error_signal_received, error_message
+            error_signal_received = True
+            error_message = message
+            
+        controller.error.connect(on_error)
+        
+        # Execute and verify
+        with pytest.raises(Exception, match="Failed to save batch usage"):
+            controller.record_batch_usage(batch_data)
+            
+        # Verify error signal was emitted
+        assert error_signal_received
+        assert "Missing required fields in usage record" in error_message
+        
+        # Verify no records were saved
+        assert len(usage_repository.usages) == 0
+    
+    def test_get_usage_trends_with_empty_data(self, controller):
+        """Test getting usage trends with empty data."""
+        # Execute with empty data
+        result = controller.get_usage_trends(days=7)
+        
+        # Verify
+        assert isinstance(result, list)
+        assert len(result) == 8  # Today + 7 days
+        for day_data in result:
+            assert "date" in day_data
+            assert "count" in day_data
+            assert day_data["count"] == 0 

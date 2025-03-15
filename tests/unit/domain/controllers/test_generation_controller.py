@@ -276,3 +276,114 @@ class TestGenerationController:
         assert sorted(variables) == sorted(["name", "location"])
         assert controller.template_engine.extract_variables_called
         assert controller.template_engine.last_template == template 
+    
+    def test_generate_from_prompt_id_exception(self, controller, repository):
+        """Test exception handling in generate_from_prompt_id method."""
+        # Setup
+        repository.get_by_id = MagicMock(side_effect=Exception("Repository error"))
+        
+        # Register signal spy
+        error_signal_received = False
+        error_message = None
+        
+        def on_error(message):
+            nonlocal error_signal_received, error_message
+            error_signal_received = True
+            error_message = message
+        
+        controller.error.connect(on_error)
+        
+        # Execute
+        result = controller.generate_from_prompt_id(1, {})
+        
+        # Verify
+        assert result is None
+        assert error_signal_received
+        assert "Error generating prompt from ID 1" in error_message
+        assert "Repository error" in error_message
+    
+    def test_generate_from_template_exception(self, controller, template_engine):
+        """Test exception handling in generate_from_template method."""
+        # Setup
+        template_engine.render = MagicMock(side_effect=Exception("Template rendering error"))
+        
+        # Register signal spy
+        error_signal_received = False
+        error_message = None
+        
+        def on_error(message):
+            nonlocal error_signal_received, error_message
+            error_signal_received = True
+            error_message = message
+        
+        controller.error.connect(on_error)
+        
+        # Execute
+        result = controller.generate_from_template("Test {{ variable }}", {})
+        
+        # Verify
+        assert result is None
+        assert error_signal_received
+        assert "Error generating prompt from template" in error_message
+        assert "Template rendering error" in error_message
+    
+    def test_get_available_variables_prompt_without_content(self, controller, repository):
+        """Test get_available_variables when prompt has no content or metadata."""
+        # Setup
+        prompt = Prompt()
+        prompt._id = 3
+        prompt._title = "Empty Prompt"
+        prompt._content = ""
+        prompt._metadata = {}
+        repository.prompts[3] = prompt
+        
+        # Set up the mock to return empty list
+        controller.template_engine.variables_to_return = []
+        
+        # Execute
+        variables = controller.get_available_variables(3)
+        
+        # Verify
+        assert variables == []
+        assert repository.get_by_id_called
+        assert controller.template_engine.extract_variables_called
+    
+    def test_get_available_variables_exception(self, controller, repository):
+        """Test exception handling in get_available_variables method."""
+        # Setup
+        repository.get_by_id = MagicMock(side_effect=Exception("Repository access error"))
+        
+        # Execute
+        variables = controller.get_available_variables(1)
+        
+        # Verify
+        assert variables == []
+    
+    def test_extract_variables_from_template_exception(self, controller, template_engine):
+        """Test exception handling in extract_variables_from_template method."""
+        # Setup
+        template_engine.extract_variables = MagicMock(side_effect=Exception("Extraction error"))
+        
+        # Execute
+        variables = controller.extract_variables_from_template("Invalid {{ template")
+        
+        # Verify
+        assert variables == []
+    
+    def test_get_available_variables_prompt_not_found(self, controller, repository):
+        """Test get_available_variables when the prompt is not found."""
+        # Setup
+        # Ensure the repository returns None for the prompt
+        original_get_by_id = repository.get_by_id
+        mock_get_by_id = MagicMock(return_value=None)
+        repository.get_by_id = mock_get_by_id
+        
+        # Execute
+        variables = controller.get_available_variables(999)
+        
+        # Verify
+        assert variables == []
+        assert mock_get_by_id.called
+        
+        # Restore original method for other tests
+        repository.get_by_id = original_get_by_id 

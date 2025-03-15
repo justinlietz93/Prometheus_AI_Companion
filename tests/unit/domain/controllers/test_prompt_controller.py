@@ -232,6 +232,8 @@ class TestPromptController:
         # Setup
         prompt = Prompt()
         prompt._title = "Error Prompt"
+        # Add content to avoid validation error
+        prompt._content = "Test content"
         repository.save = MagicMock(side_effect=Exception("Database error"))
         
         # Register signal spy
@@ -250,7 +252,7 @@ class TestPromptController:
         
         # Verify
         assert error_signal_received
-        assert "Database error" in error_message
+        assert "Failed to save prompt: Database error" in error_message
     
     def test_delete_prompt(self, controller, repository, sample_prompt):
         """Test deleting a prompt."""
@@ -280,6 +282,9 @@ class TestPromptController:
     def test_delete_prompt_error(self, controller, repository):
         """Test deleting a prompt with an error."""
         # Setup
+        # Add a mock prompt to the repository so it passes the existence check
+        mock_prompt = MagicMock()
+        repository.get_by_id = MagicMock(return_value=mock_prompt)
         repository.delete = MagicMock(side_effect=Exception("Database error"))
         
         # Register signal spy
@@ -298,7 +303,7 @@ class TestPromptController:
         
         # Verify
         assert error_signal_received
-        assert "Database error" in error_message
+        assert "Failed to delete prompt: Database error" in error_message
     
     def test_filter_prompts(self, controller, repository, sample_prompt):
         """Test filtering prompts."""
@@ -349,4 +354,357 @@ class TestPromptController:
         assert selection_changed
         assert len(selected_list) == 0
         assert controller.selected_prompts == []
-        assert controller.current_prompt is None 
+        assert controller.current_prompt is None
+        
+    def test_create_new_prompt(self, controller):
+        """Test creating a new prompt."""
+        # Execute
+        new_prompt = controller.create_new_prompt()
+        
+        # Verify
+        assert isinstance(new_prompt, Prompt)
+        assert new_prompt.id is None
+        assert new_prompt.title == ""
+        assert new_prompt.content == ""
+        
+    def test_validate_prompt_empty_title(self, controller):
+        """Test prompt validation with empty title."""
+        # Setup
+        prompt = Prompt()
+        prompt._content = "Content"
+        prompt._title = ""
+        
+        # Execute
+        errors = controller._validate_prompt(prompt)
+        
+        # Verify
+        assert len(errors) == 1
+        assert "Title cannot be empty" in errors[0]
+        
+    def test_validate_prompt_empty_content(self, controller):
+        """Test prompt validation with empty content."""
+        # Setup
+        prompt = Prompt()
+        prompt._content = ""
+        prompt._title = "Title"
+        
+        # Execute
+        errors = controller._validate_prompt(prompt)
+        
+        # Verify
+        assert len(errors) == 1
+        assert "Content cannot be empty" in errors[0]
+        
+    def test_validate_prompt_title_too_long(self, controller):
+        """Test prompt validation with title exceeding max length."""
+        # Setup
+        prompt = Prompt()
+        prompt._content = "Content"
+        prompt._title = "X" * 256  # Create a title > 255 chars
+        
+        # Execute
+        errors = controller._validate_prompt(prompt)
+        
+        # Verify
+        assert len(errors) == 1
+        assert "Title cannot exceed 255 characters" in errors[0]
+        
+    def test_validate_prompt_multiple_errors(self, controller):
+        """Test prompt validation with multiple errors."""
+        # Setup
+        prompt = Prompt()
+        prompt._content = ""
+        prompt._title = "X" * 256  # Create a title > 255 chars
+        
+        # Execute
+        errors = controller._validate_prompt(prompt)
+        
+        # Verify
+        assert len(errors) == 2
+        assert any("Title cannot exceed 255 characters" in error for error in errors)
+        assert any("Content cannot be empty" in error for error in errors)
+        
+    def test_save_prompt_validation_error(self, controller):
+        """Test saving a prompt with validation errors."""
+        # Setup
+        prompt = Prompt()
+        prompt._title = ""  # Empty title to trigger validation error
+        
+        # Register signal spy
+        error_signal_received = False
+        error_message = None
+        saved_signal_received = False
+        
+        def on_operation_error(message):
+            nonlocal error_signal_received, error_message
+            error_signal_received = True
+            error_message = message
+            
+        def on_prompt_saved(prompt):
+            nonlocal saved_signal_received
+            saved_signal_received = True
+            
+        controller.operationError.connect(on_operation_error)
+        controller.promptSaved.connect(on_prompt_saved)
+        
+        # Execute
+        controller.save_prompt(prompt)
+        
+        # Verify
+        assert error_signal_received
+        assert "Validation errors" in error_message
+        assert "Title cannot be empty" in error_message
+        assert not saved_signal_received
+        
+    def test_select_prompt_not_found(self, controller, repository):
+        """Test selecting a prompt that doesn't exist."""
+        # Setup
+        repository.get_by_id = MagicMock(return_value=None)
+        
+        # Register signal spy
+        error_signal_received = False
+        error_message = None
+        
+        def on_operation_error(message):
+            nonlocal error_signal_received, error_message
+            error_signal_received = True
+            error_message = message
+            
+        controller.operationError.connect(on_operation_error)
+        
+        # Execute
+        controller.select_prompt(999)  # Non-existent ID
+        
+        # Verify
+        assert error_signal_received
+        assert "not found" in error_message
+
+    def test_select_prompt_error(self, controller, repository):
+        """Test selecting a prompt with an error."""
+        # Setup
+        repository.get_by_id = MagicMock(side_effect=Exception("Database error"))
+        
+        # Register signal spy
+        error_signal_received = False
+        error_message = None
+        
+        def on_operation_error(message):
+            nonlocal error_signal_received, error_message
+            error_signal_received = True
+            error_message = message
+            
+        controller.operationError.connect(on_operation_error)
+        
+        # Execute
+        controller.select_prompt(1)
+        
+        # Verify
+        assert error_signal_received
+        assert "Failed to select prompt" in error_message
+        
+    def test_multi_select_prompts(self, controller, repository, sample_prompt):
+        """Test selecting multiple prompts."""
+        # Setup
+        prompt1 = sample_prompt
+        prompt2 = Prompt()
+        prompt2._id = 2
+        prompt2._title = "Second Prompt"
+        prompt2._content = "Second content"
+        
+        repository.prompts[1] = prompt1
+        repository.prompts[2] = prompt2
+        
+        # Register signal spy
+        selection_changed = False
+        selected_prompts = None
+        
+        def on_selection_changed(prompts):
+            nonlocal selection_changed, selected_prompts
+            selection_changed = True
+            selected_prompts = prompts
+            
+        controller.selectionChanged.connect(on_selection_changed)
+        
+        # Execute
+        controller.multi_select_prompts([1, 2])
+        
+        # Verify
+        assert selection_changed
+        assert len(selected_prompts) == 2
+        assert controller.current_prompt.id == 1  # First prompt is current
+        assert controller.selected_prompts[0].id == 1
+        assert controller.selected_prompts[1].id == 2
+        
+    def test_multi_select_prompts_none_found(self, controller, repository):
+        """Test selecting multiple prompts when none exist."""
+        # Setup
+        repository.get_by_id = MagicMock(return_value=None)
+        
+        # Register signal spy
+        selection_changed = False
+        selected_prompts = None
+        
+        def on_selection_changed(prompts):
+            nonlocal selection_changed, selected_prompts
+            selection_changed = True
+            selected_prompts = prompts
+            
+        controller.selectionChanged.connect(on_selection_changed)
+        
+        # Execute
+        controller.multi_select_prompts([1, 2])
+        
+        # Verify
+        assert selection_changed
+        assert len(selected_prompts) == 0
+        assert controller.current_prompt is None
+        
+    def test_multi_select_prompts_error(self, controller, repository):
+        """Test selecting multiple prompts with an error."""
+        # Setup
+        repository.get_by_id = MagicMock(side_effect=Exception("Database error"))
+        
+        # Register signal spy
+        error_signal_received = False
+        error_message = None
+        
+        def on_operation_error(message):
+            nonlocal error_signal_received, error_message
+            error_signal_received = True
+            error_message = message
+            
+        controller.operationError.connect(on_operation_error)
+        
+        # Execute
+        controller.multi_select_prompts([1, 2])
+        
+        # Verify
+        assert error_signal_received
+        assert "Failed to select prompts" in error_message
+        
+    def test_batch_delete_prompts_success(self, controller, repository, sample_prompt):
+        """Test batch deleting prompts successfully."""
+        # Setup
+        prompt1 = sample_prompt
+        prompt2 = Prompt()
+        prompt2._id = 2
+        prompt2._title = "Second Prompt"
+        prompt2._content = "Second content"
+        
+        repository.prompts[1] = prompt1
+        repository.prompts[2] = prompt2
+        
+        # Register signal spies
+        delete_signals = []
+        success_signal_received = False
+        success_message = None
+        
+        def on_prompt_deleted(prompt_id):
+            delete_signals.append(prompt_id)
+            
+        def on_operation_success(message):
+            nonlocal success_signal_received, success_message
+            success_signal_received = True
+            success_message = message
+            
+        controller.promptDeleted.connect(on_prompt_deleted)
+        controller.operationSuccess.connect(on_operation_success)
+        
+        # Execute
+        controller.batch_delete_prompts([1, 2])
+        
+        # Verify
+        assert repository.delete_called
+        assert len(delete_signals) == 2
+        assert "1" in delete_signals
+        assert "2" in delete_signals
+        assert success_signal_received
+        assert "Successfully deleted" in success_message
+        assert len(repository.prompts) == 0
+        
+    def test_batch_delete_prompts_partial_success(self, controller, repository, sample_prompt):
+        """Test batch deleting prompts with partial success."""
+        # Setup
+        repository.prompts[1] = sample_prompt
+        
+        # Make delete fail for ID 2 by returning False
+        original_delete = repository.delete
+        def mock_delete(prompt_id):
+            if prompt_id == 1:
+                del repository.prompts[prompt_id]
+                return True
+            return False
+        repository.delete = mock_delete
+        
+        # Register signal spies
+        delete_signals = []
+        error_signal_received = False
+        error_message = None
+        
+        def on_prompt_deleted(prompt_id):
+            delete_signals.append(prompt_id)
+            
+        def on_operation_error(message):
+            nonlocal error_signal_received, error_message
+            error_signal_received = True
+            error_message = message
+            
+        controller.promptDeleted.connect(on_prompt_deleted)
+        controller.operationError.connect(on_operation_error)
+        
+        # Execute
+        controller.batch_delete_prompts([1, 2])
+        
+        # Verify
+        assert len(delete_signals) == 1
+        assert "1" in delete_signals
+        assert error_signal_received
+        assert "Partially successful" in error_message
+        assert len(repository.prompts) == 0
+        
+    def test_batch_delete_prompts_complete_failure(self, controller, repository):
+        """Test batch deleting prompts with complete failure."""
+        # Setup
+        # Make delete fail for all IDs
+        repository.delete = MagicMock(return_value=False)
+        
+        # Register signal spy
+        error_signal_received = False
+        error_message = None
+        
+        def on_operation_error(message):
+            nonlocal error_signal_received, error_message
+            error_signal_received = True
+            error_message = message
+            
+        controller.operationError.connect(on_operation_error)
+        
+        # Execute
+        controller.batch_delete_prompts([1, 2])
+        
+        # Verify
+        assert error_signal_received
+        assert "Failed to delete any prompts" in error_message
+        
+    def test_batch_delete_prompts_error(self, controller, repository):
+        """Test batch deleting prompts with an exception."""
+        # Setup
+        repository.delete = MagicMock(side_effect=Exception("Database error"))
+        
+        # Register signal spy
+        error_signal_received = False
+        error_message = None
+        
+        def on_operation_error(message):
+            nonlocal error_signal_received, error_message
+            error_signal_received = True
+            error_message = message
+            
+        controller.operationError.connect(on_operation_error)
+        
+        # Execute
+        controller.batch_delete_prompts([1, 2])
+        
+        # Verify
+        assert error_signal_received
+        assert "Failed to delete any prompts" in error_message 
