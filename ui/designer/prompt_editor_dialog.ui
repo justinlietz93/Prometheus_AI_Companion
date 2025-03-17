@@ -1,0 +1,562 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PromptEditorDialog</class>
+ <widget class="QDialog" name="PromptEditorDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Edit Prompt</string>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="generalTab">
+      <attribute name="title">
+       <string>General</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <layout class="QFormLayout" name="formLayout">
+         <property name="labelAlignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="titleLabel">
+           <property name="text">
+            <string>Title:</string>
+           </property>
+           <property name="buddy">
+            <cstring>titleLineEdit</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="titleLineEdit">
+           <property name="placeholderText">
+            <string>Enter prompt title (required)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="descriptionLabel">
+           <property name="text">
+            <string>Description:</string>
+           </property>
+           <property name="buddy">
+            <cstring>descriptionTextEdit</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QTextEdit" name="descriptionTextEdit">
+           <property name="placeholderText">
+            <string>Enter a brief description of this prompt</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="categoryLabel">
+           <property name="text">
+            <string>Category:</string>
+           </property>
+           <property name="buddy">
+            <cstring>categoryComboBox</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QComboBox" name="categoryComboBox"/>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="tagsLabel">
+           <property name="text">
+            <string>Tags:</string>
+           </property>
+           <property name="buddy">
+            <cstring>tagsListWidget</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <layout class="QHBoxLayout" name="tagsLayout">
+           <item>
+            <widget class="QListWidget" name="tagsListWidget">
+             <property name="selectionMode">
+              <enum>QAbstractItemView::MultiSelection</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="tagButtonsLayout">
+             <item>
+              <widget class="QPushButton" name="addTagButton">
+               <property name="text">
+                <string>Add</string>
+               </property>
+               <property name="icon">
+                <iconset>
+                 <normaloff>../resources/images/add.png</normaloff>../resources/images/add.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="removeTagButton">
+               <property name="text">
+                <string>Remove</string>
+               </property>
+               <property name="icon">
+                <iconset>
+                 <normaloff>../resources/images/remove.png</normaloff>../resources/images/remove.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="verticalSpacer">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="visibilityLabel">
+           <property name="text">
+            <string>Visibility:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <layout class="QHBoxLayout" name="visibilityLayout">
+           <item>
+            <widget class="QCheckBox" name="isPublicCheckBox">
+             <property name="text">
+              <string>Public</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="isFeaturedCheckBox">
+             <property name="text">
+              <string>Featured</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="isCustomCheckBox">
+             <property name="text">
+              <string>Custom</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="contentTab">
+      <attribute name="title">
+       <string>Content</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QLabel" name="contentLabel">
+         <property name="text">
+          <string>Prompt Template:</string>
+         </property>
+         <property name="buddy">
+          <cstring>contentTextEdit</cstring>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTextEdit" name="contentTextEdit">
+         <property name="placeholderText">
+          <string>Enter your prompt template here. Use {{variable_name}} for variables.</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="variablesGroupBox">
+         <property name="title">
+          <string>Variables</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <widget class="QTableWidget" name="variablesTableWidget">
+            <property name="columnCount">
+             <number>3</number>
+            </property>
+            <column>
+             <property name="text">
+              <string>Name</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Default Value</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Description</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="variableButtonsLayout">
+            <item>
+             <widget class="QPushButton" name="addVariableButton">
+              <property name="text">
+               <string>Add Variable</string>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>../resources/images/add.png</normaloff>../resources/images/add.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="removeVariableButton">
+              <property name="text">
+               <string>Remove Variable</string>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>../resources/images/remove.png</normaloff>../resources/images/remove.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="previewTab">
+      <attribute name="title">
+       <string>Preview</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QGroupBox" name="previewGroupBox">
+         <property name="title">
+          <string>Preview with Current Variables</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_6">
+          <item>
+           <widget class="QTextEdit" name="previewTextEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="testVariablesGroupBox">
+         <property name="title">
+          <string>Test Variables</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_7">
+          <item>
+           <widget class="QTableWidget" name="testVariablesTableWidget">
+            <property name="columnCount">
+             <number>2</number>
+            </property>
+            <column>
+             <property name="text">
+              <string>Variable</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Test Value</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="previewButtonsLayout">
+            <item>
+             <widget class="QPushButton" name="updatePreviewButton">
+              <property name="text">
+               <string>Update Preview</string>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>../resources/images/refresh.png</normaloff>../resources/images/refresh.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="metadataTab">
+      <attribute name="title">
+       <string>Metadata</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_8">
+       <item>
+        <widget class="QGroupBox" name="metadataGroupBox">
+         <property name="title">
+          <string>Additional Metadata</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_9">
+          <item>
+           <widget class="QTableWidget" name="metadataTableWidget">
+            <property name="alternatingRowColors">
+             <bool>true</bool>
+            </property>
+            <property name="columnCount">
+             <number>2</number>
+            </property>
+            <column>
+             <property name="text">
+              <string>Key</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Value</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="metadataButtonsLayout">
+            <item>
+             <widget class="QPushButton" name="addMetadataButton">
+              <property name="text">
+               <string>Add</string>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>../resources/images/add.png</normaloff>../resources/images/add.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="removeMetadataButton">
+              <property name="text">
+               <string>Remove</string>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>../resources/images/remove.png</normaloff>../resources/images/remove.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_4">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="infoGroupBox">
+         <property name="title">
+          <string>System Information</string>
+         </property>
+         <layout class="QFormLayout" name="formLayout_2">
+          <property name="labelAlignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <item row="0" column="0">
+           <widget class="QLabel" name="createdDateLabel">
+            <property name="text">
+             <string>Created:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="createdDateValue">
+            <property name="text">
+             <string>N/A</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="modifiedDateLabel">
+            <property name="text">
+             <string>Last Modified:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="modifiedDateValue">
+            <property name="text">
+             <string>N/A</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="usageCountLabel">
+            <property name="text">
+             <string>Usage Count:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="usageCountValue">
+            <property name="text">
+             <string>N/A</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Help|QDialogButtonBox::Reset|QDialogButtonBox::Save</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>titleLineEdit</tabstop>
+  <tabstop>descriptionTextEdit</tabstop>
+  <tabstop>categoryComboBox</tabstop>
+  <tabstop>tagsListWidget</tabstop>
+  <tabstop>addTagButton</tabstop>
+  <tabstop>removeTagButton</tabstop>
+  <tabstop>isPublicCheckBox</tabstop>
+  <tabstop>isFeaturedCheckBox</tabstop>
+  <tabstop>isCustomCheckBox</tabstop>
+  <tabstop>contentTextEdit</tabstop>
+  <tabstop>variablesTableWidget</tabstop>
+  <tabstop>addVariableButton</tabstop>
+  <tabstop>removeVariableButton</tabstop>
+  <tabstop>previewTextEdit</tabstop>
+  <tabstop>testVariablesTableWidget</tabstop>
+  <tabstop>updatePreviewButton</tabstop>
+  <tabstop>metadataTableWidget</tabstop>
+  <tabstop>addMetadataButton</tabstop>
+  <tabstop>removeMetadataButton</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>PromptEditorDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>399</x>
+     <y>579</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>PromptEditorDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>399</x>
+     <y>579</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui> 

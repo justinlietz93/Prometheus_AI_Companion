@@ -49,9 +49,10 @@ class PromptListItem(QWidget):
         self.type_tag = QLabel(self.prompt_type)
         self.type_tag.setObjectName("promptTypeTag")
         self.type_tag.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.type_tag.setMaximumWidth(100)
-        self.type_tag.setMinimumWidth(80)
-        self.type_tag.setStyleSheet("background-color: #2980b9; color: white; border-radius: 10px; padding: 2px 5px;")
+        self.type_tag.setMinimumWidth(120)  # Increased minimum width to reduce truncation
+        # No fixed maximum width to allow text to display completely
+        # Transparent background with border instead of colored background
+        self.type_tag.setStyleSheet("background-color: transparent; color: #333333; border: 1px solid #CCCCCC; border-radius: 3px; padding: 2px 6px;")
         self.type_tag.setToolTip(f"Type: {self.prompt_type}")  # Add tooltip to tag
         layout.addWidget(self.type_tag)
         
@@ -68,16 +69,15 @@ class PromptListItem(QWidget):
         
     def updateStyle(self, is_dark_mode, accent_color=None):
         """Update the styling based on the current theme"""
-        if accent_color:
-            # Handle both QColor objects and string color values
-            if isinstance(accent_color, QColor):
-                tag_color = accent_color.name()
-            else:
-                tag_color = accent_color  # Already a string
+        if is_dark_mode:
+            text_color = "#FFFFFF"
+            border_color = "#555555"
         else:
-            tag_color = "#2980b9" if is_dark_mode else "#3498db"
+            text_color = "#333333"
+            border_color = "#CCCCCC"
             
-        self.type_tag.setStyleSheet(f"background-color: {tag_color}; color: white; border-radius: 10px; padding: 2px 5px;")
+        # Apply transparent background with border instead of colored background
+        self.type_tag.setStyleSheet(f"background-color: transparent; color: {text_color}; border: 1px solid {border_color}; border-radius: 3px; padding: 2px 6px;")
             
     def mousePressEvent(self, event):
         """Handle mouse press events"""

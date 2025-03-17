@@ -1,0 +1,604 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ImportExportDialog</class>
+ <widget class="QDialog" name="ImportExportDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>600</width>
+    <height>450</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Import/Export Prompts</string>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="operationGroupBox">
+     <property name="title">
+      <string>Operation</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QRadioButton" name="importRadioButton">
+        <property name="text">
+         <string>Import Prompts</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="exportRadioButton">
+        <property name="text">
+         <string>Export Prompts</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QStackedWidget" name="stackedWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="importPage">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <layout class="QFormLayout" name="formLayout">
+         <property name="labelAlignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="importFileLabel">
+           <property name="text">
+            <string>File:</string>
+           </property>
+           <property name="buddy">
+            <cstring>importFilePathEdit</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <layout class="QHBoxLayout" name="importFileLayout">
+           <item>
+            <widget class="QLineEdit" name="importFilePathEdit">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+             <property name="placeholderText">
+              <string>Select file to import...</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="browseImportButton">
+             <property name="text">
+              <string>Browse...</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="importFormatLabel">
+           <property name="text">
+            <string>Format:</string>
+           </property>
+           <property name="buddy">
+            <cstring>importFormatComboBox</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QComboBox" name="importFormatComboBox">
+           <item>
+            <property name="text">
+             <string>JSON (.json)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>CSV (.csv)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>SQLite (.db)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>XML (.xml)</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="importOptionsLabel">
+           <property name="text">
+            <string>Options:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <layout class="QVBoxLayout" name="importOptionsLayout">
+           <item>
+            <widget class="QCheckBox" name="overwriteExistingCheckBox">
+             <property name="text">
+              <string>Overwrite existing prompts with same ID</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="importTagsCheckBox">
+             <property name="text">
+              <string>Import tags and categories</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="importMetadataCheckBox">
+             <property name="text">
+              <string>Import metadata</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="preserveCreationDateCheckBox">
+             <property name="text">
+              <string>Preserve original creation date and author</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="importPreviewGroupBox">
+         <property name="title">
+          <string>Preview</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <widget class="QTableWidget" name="importPreviewTable">
+            <property name="alternatingRowColors">
+             <bool>true</bool>
+            </property>
+            <property name="selectionMode">
+             <enum>QAbstractItemView::MultiSelection</enum>
+            </property>
+            <property name="selectionBehavior">
+             <enum>QAbstractItemView::SelectRows</enum>
+            </property>
+            <attribute name="horizontalHeaderStretchLastSection">
+             <bool>true</bool>
+            </attribute>
+            <column>
+             <property name="text">
+              <string>Title</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Category</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Tags</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <widget class="QPushButton" name="previewImportButton">
+              <property name="text">
+               <string>Preview Import</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="importCountLabel">
+              <property name="text">
+               <string>0 prompts selected</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="exportPage">
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <layout class="QFormLayout" name="formLayout_2">
+         <property name="labelAlignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="exportFileLabel">
+           <property name="text">
+            <string>File:</string>
+           </property>
+           <property name="buddy">
+            <cstring>exportFilePathEdit</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <layout class="QHBoxLayout" name="exportFileLayout">
+           <item>
+            <widget class="QLineEdit" name="exportFilePathEdit">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+             <property name="placeholderText">
+              <string>Select export destination...</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="browseExportButton">
+             <property name="text">
+              <string>Browse...</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="exportFormatLabel">
+           <property name="text">
+            <string>Format:</string>
+           </property>
+           <property name="buddy">
+            <cstring>exportFormatComboBox</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QComboBox" name="exportFormatComboBox">
+           <item>
+            <property name="text">
+             <string>JSON (.json)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>CSV (.csv)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>SQLite (.db)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>XML (.xml)</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="exportOptionsLabel">
+           <property name="text">
+            <string>Options:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <layout class="QVBoxLayout" name="exportOptionsLayout">
+           <item>
+            <widget class="QCheckBox" name="exportTagsCheckBox">
+             <property name="text">
+              <string>Export tags and categories</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="exportMetadataCheckBox">
+             <property name="text">
+              <string>Export metadata</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="exportUsageStatsCheckBox">
+             <property name="text">
+              <string>Include usage statistics</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="exportScoresCheckBox">
+             <property name="text">
+              <string>Include prompt scores and feedback</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="promptSelectionLabel">
+           <property name="text">
+            <string>Selection:</string>
+           </property>
+           <property name="buddy">
+            <cstring>selectionComboBox</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QComboBox" name="selectionComboBox">
+           <item>
+            <property name="text">
+             <string>All prompts</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Selected prompts only</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Custom selection</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="exportSelectionGroupBox">
+         <property name="title">
+          <string>Prompts to Export</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item>
+           <widget class="QTableWidget" name="exportSelectionTable">
+            <property name="alternatingRowColors">
+             <bool>true</bool>
+            </property>
+            <property name="selectionMode">
+             <enum>QAbstractItemView::MultiSelection</enum>
+            </property>
+            <property name="selectionBehavior">
+             <enum>QAbstractItemView::SelectRows</enum>
+            </property>
+            <attribute name="horizontalHeaderStretchLastSection">
+             <bool>true</bool>
+            </attribute>
+            <column>
+             <property name="text">
+              <string>ID</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Title</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Category</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Tags</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QPushButton" name="selectAllButton">
+              <property name="text">
+               <string>Select All</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="deselectAllButton">
+              <property name="text">
+               <string>Deselect All</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="exportCountLabel">
+              <property name="text">
+               <string>0 prompts selected</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="progressGroupBox">
+     <property name="title">
+      <string>Progress</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_6">
+      <item>
+       <widget class="QProgressBar" name="progressBar">
+        <property name="value">
+         <number>0</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="statusLabel">
+        <property name="text">
+         <string>Ready</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Help|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>importRadioButton</tabstop>
+  <tabstop>exportRadioButton</tabstop>
+  <tabstop>importFilePathEdit</tabstop>
+  <tabstop>browseImportButton</tabstop>
+  <tabstop>importFormatComboBox</tabstop>
+  <tabstop>overwriteExistingCheckBox</tabstop>
+  <tabstop>importTagsCheckBox</tabstop>
+  <tabstop>importMetadataCheckBox</tabstop>
+  <tabstop>preserveCreationDateCheckBox</tabstop>
+  <tabstop>importPreviewTable</tabstop>
+  <tabstop>previewImportButton</tabstop>
+  <tabstop>exportFilePathEdit</tabstop>
+  <tabstop>browseExportButton</tabstop>
+  <tabstop>exportFormatComboBox</tabstop>
+  <tabstop>exportTagsCheckBox</tabstop>
+  <tabstop>exportMetadataCheckBox</tabstop>
+  <tabstop>exportUsageStatsCheckBox</tabstop>
+  <tabstop>exportScoresCheckBox</tabstop>
+  <tabstop>selectionComboBox</tabstop>
+  <tabstop>exportSelectionTable</tabstop>
+  <tabstop>selectAllButton</tabstop>
+  <tabstop>deselectAllButton</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>ImportExportDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>299</x>
+     <y>429</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>224</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>ImportExportDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>299</x>
+     <y>429</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>224</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>importRadioButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>stackedWidget</receiver>
+   <slot>setCurrentIndex(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>85</x>
+     <y>31</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>197</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui> 

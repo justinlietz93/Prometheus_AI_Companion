@@ -1,0 +1,15 @@
+{
+  "title": "Database Design Prompt",
+  "description": "A technical prompt for database design and implementation",
+  "template": "Design a database schema for {application_purpose}. Your design should:\n\n1. Include entity-relationship diagrams\n2. Define tables, columns, and data types\n3. Specify primary and foreign keys\n4. Consider normalization and performance\n5. Include indexing strategy\n\nProvide SQL DDL statements for creating the schema and explain your design decisions.",
+  "metadata": {
+    "author": "Prometheus AI",
+    "version": "1.0.0",
+    "created": "2025-03-09",
+    "tags": [
+      "database", 
+      "schema design", 
+      "SQL"
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "title": "Code Review Prompt",
+  "description": "A guide for conducting thorough code reviews",
+  "template": "Perform a comprehensive code review of the following {language} code:\n\n```\n{code_snippet}\n```\n\nYour review should address:\n\n1. Code quality and readability\n2. Potential bugs or edge cases\n3. Performance optimizations\n4. Security vulnerabilities\n5. Adherence to language conventions and best practices\n\nProvide specific, actionable feedback with examples of how to improve the code.",
+  "metadata": {
+    "author": "Prometheus AI",
+    "version": "1.0.0",
+    "created": "2025-03-09",
+    "tags": [
+      "code review", 
+      "quality assurance", 
+      "programming"
+    ]
+  }
+}

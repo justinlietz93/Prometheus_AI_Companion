@@ -9,7 +9,7 @@ import os
 import sys
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QListWidgetItem, QFontDialog, QColorDialog, 
-    QFileDialog, QMessageBox, QMenu, QApplication
+    QFileDialog, QMessageBox, QMenu, QApplication, QListWidget
 )
 from PyQt6.QtGui import QFont, QAction, QColor, QIcon
 from PyQt6.QtCore import Qt, pyqtSignal, QSize
@@ -88,6 +88,9 @@ class DesignerPrometheusPromptGenerator(QMainWindow):
         
         # Connect search input
         widgets.searchInput.textChanged.connect(self.filter_prompts)
+        
+        # Set up QListWidget selection behavior - use ExtendedSelection for drag-to-select
+        widgets.promptList.setSelectionMode(QListWidget.SelectionMode.ExtendedSelection)
         
         # Connect prompt list selection
         widgets.promptList.itemClicked.connect(self.handle_item_selection)
@@ -289,21 +292,16 @@ class DesignerPrometheusPromptGenerator(QMainWindow):
     
     def handle_item_selection(self, item):
         """Handle selection of an item in the prompt list."""
-        # Get the widget to access the prompt type
-        item_widget = self.promptList.itemWidget(item)
-        if not item_widget:
-            return
-            
-        prompt_type = item_widget.prompt_type
+        # Update selected_prompts to match the current UI selection state
+        self.selected_prompts = []
         
-        # Toggle selection state
-        if prompt_type in self.selected_prompts:
-            self.selected_prompts.remove(prompt_type)
-        else:
-            self.selected_prompts.append(prompt_type)
-        
-        # Update the UI to reflect the selection state
-        self.update_selection_display()
+        # Get all currently selected items
+        for i in range(self.promptList.count()):
+            item = self.promptList.item(i)
+            if item.isSelected():
+                item_widget = self.promptList.itemWidget(item)
+                if item_widget:
+                    self.selected_prompts.append(item_widget.prompt_type)
     
     def handle_resize(self):
         """Handle window resize events."""
@@ -317,20 +315,41 @@ class DesignerPrometheusPromptGenerator(QMainWindow):
     
     def select_all_prompts(self):
         """Select all prompt types in the list."""
-        self.selected_prompts = []
-        for i in range(self.promptList.count()):
-            item = self.promptList.item(i)
-            item_widget = self.promptList.itemWidget(item)
-            if item_widget:
-                self.selected_prompts.append(item_widget.prompt_type)
+        # Block signals to prevent unnecessary updates
+        self.promptList.blockSignals(True)
         
-        # Update UI to reflect selection state
-        self.update_selection_display()
+        try:
+            # Clear and rebuild selected prompts list
+            self.selected_prompts = []
+            
+            # Select all items in the UI and track them
+            for i in range(self.promptList.count()):
+                item = self.promptList.item(i)
+                if not item.isHidden(): # Only select visible items if filtering is active
+                    item.setSelected(True)
+                    item_widget = self.promptList.itemWidget(item)
+                    if item_widget:
+                        self.selected_prompts.append(item_widget.prompt_type)
+        finally:
+            # Unblock signals
+            self.promptList.blockSignals(False)
     
     def select_no_prompts(self):
         """Deselect all prompt types in the list."""
-        self.selected_prompts = []
-        self.update_selection_display()
+        # Block signals to prevent unnecessary updates
+        self.promptList.blockSignals(True)
+        
+        try:
+            # Clear selected prompts list
+            self.selected_prompts = []
+            
+            # Deselect all items in the UI
+            for i in range(self.promptList.count()):
+                item = self.promptList.item(i)
+                item.setSelected(False)
+        finally:
+            # Unblock signals
+            self.promptList.blockSignals(False)
     
     def generate_prompts(self):
         """Generate prompts based on selected types and urgency level."""
@@ -343,6 +362,22 @@ class DesignerPrometheusPromptGenerator(QMainWindow):
             )
             return
             
+        # DEBUG: Show what's in selected_prompts
+        print(f"DEBUG: Selected prompts: {self.selected_prompts}")
+        
+        # DEBUG: Reconfirm what's actually selected in the UI
+        ui_selected = []
+        for i in range(self.promptList.count()):
+            item = self.promptList.item(i)
+            if item.isSelected():
+                widget = self.promptList.itemWidget(item)
+                if widget:
+                    ui_selected.append(widget.prompt_type)
+        print(f"DEBUG: UI Selected items: {ui_selected}")
+        
+        # Synchronize selected_prompts with UI selections to ensure consistency
+        self.selected_prompts = ui_selected
+        
         # Get urgency level
         urgency_level = self.urgencySlider.value()
         
@@ -356,26 +391,51 @@ class DesignerPrometheusPromptGenerator(QMainWindow):
         # Generate prompts
         generated_texts = []
         
+        # Process all selected prompts
         for prompt_type in self.selected_prompts:
             try:
                 # Get prompt template
                 prompt_data = self.prompt_library.get(prompt_type)
                 
+                # DEBUG: Show what data we're getting for each prompt
+                print(f"DEBUG: Prompt type: {prompt_type}")
+                print(f"DEBUG: Title: {prompt_data.get('title', 'MISSING TITLE')}")
+                print(f"DEBUG: Has prompts array: {'prompts' in prompt_data}")
+                
                 if not prompt_data:
                     errors.append(f"Prompt type '{prompt_type}' not found in library")
                     continue
                     
-                template = prompt_data.get("template", "")
+                # Check if this is the new format (with prompts array) or old format (with template)
+                if "prompts" in prompt_data and isinstance(prompt_data["prompts"], list):
+                    # New format with urgency levels
+                    urgency_idx = min(urgency_level - 1, len(prompt_data["prompts"]) - 1)
+                    if urgency_idx < 0:
+                        urgency_idx = 0
+                    
+                    if urgency_idx < len(prompt_data["prompts"]):
+                        prompt_text = prompt_data["prompts"][urgency_idx]
+                    else:
+                        # Fallback to the first prompt if urgency level is out of range
+                        prompt_text = prompt_data["prompts"][0]
+                else:
+                    # Old format with template
+                    template = prompt_data.get("template", "")
+                    
+                    if not template:
+                        errors.append(f"Template for '{prompt_type}' is empty")
+                        continue
+                    
+                    # Generate with urgency applied
+                    prompt_text = utils.generate_template_with_urgency(template, urgency_level)
                 
-                if not template:
-                    errors.append(f"Template for '{prompt_type}' is empty")
-                    continue
-                
-                # Generate with urgency applied
-                prompt_text = utils.generate_template_with_urgency(template, urgency_level)
+                # Make sure the title always has a value, either from prompt_data or the prompt_type
+                title = prompt_data.get('title', '')
+                if not title:
+                    title = prompt_type.replace('_', ' ').title()
                 
                 # Add to results with prompt type as header
-                formatted_prompt = f"### {prompt_data.get('title', prompt_type)} ###\n\n{prompt_text}"
+                formatted_prompt = f"### {title} ###\n\n{prompt_text}"
                 generated_texts.append(formatted_prompt)
                 generated_count += 1
                 
@@ -418,23 +478,45 @@ class DesignerPrometheusPromptGenerator(QMainWindow):
     
     def filter_prompts(self, text):
         """Filter the prompt list based on search text."""
-        # If text is empty, show all prompts
-        if not text:
-            for i in range(self.promptList.count()):
-                self.promptList.item(i).setHidden(False)
-            return
+        # Block signals during updates
+        self.promptList.blockSignals(True)
         
-        # Otherwise, filter based on text
-        text = text.lower()
-        for i in range(self.promptList.count()):
-            item = self.promptList.item(i)
-            widget = self.promptList.itemWidget(item)
-            if widget:
-                display_name = widget.display_name.lower()
-                prompt_type = widget.prompt_type.lower()
-                
-                # Show if text is in display name or prompt type
-                item.setHidden(text not in display_name and text not in prompt_type)
+        try:
+            # If text is empty, show all prompts
+            if not text:
+                for i in range(self.promptList.count()):
+                    item = self.promptList.item(i)
+                    item.setHidden(False)
+                    
+                    # Restore selection state
+                    item_widget = self.promptList.itemWidget(item)
+                    if item_widget and item_widget.prompt_type in self.selected_prompts:
+                        item.setSelected(True)
+                    else:
+                        item.setSelected(False)
+                return
+            
+            # Otherwise, filter based on text
+            text = text.lower()
+            for i in range(self.promptList.count()):
+                item = self.promptList.item(i)
+                widget = self.promptList.itemWidget(item)
+                if widget:
+                    display_name = widget.display_name.lower()
+                    prompt_type = widget.prompt_type.lower()
+                    
+                    # Show if text is in display name or prompt type
+                    matches = text in display_name or text in prompt_type
+                    item.setHidden(not matches)
+                    
+                    # Restore selection state for visible items
+                    if not item.isHidden() and widget.prompt_type in self.selected_prompts:
+                        item.setSelected(True)
+                    else:
+                        item.setSelected(False)
+        finally:
+            # Unblock signals
+            self.promptList.blockSignals(False)
     
     def add_custom_prompt(self):
         """Add a custom prompt to the library."""
@@ -489,14 +571,22 @@ class DesignerPrometheusPromptGenerator(QMainWindow):
 
     def update_selection_display(self):
         """Update the UI to reflect the current selection state."""
-        for i in range(self.promptList.count()):
-            item = self.promptList.item(i)
-            item_widget = self.promptList.itemWidget(item)
-            
-            if item_widget and item_widget.prompt_type in self.selected_prompts:
-                item.setSelected(True)
-            else:
-                item.setSelected(False)
+        # Block signals during updates
+        self.promptList.blockSignals(True)
+        
+        try:
+            # Update selection states
+            for i in range(self.promptList.count()):
+                item = self.promptList.item(i)
+                item_widget = self.promptList.itemWidget(item)
+                
+                if item_widget and item_widget.prompt_type in self.selected_prompts:
+                    item.setSelected(True)
+                else:
+                    item.setSelected(False)
+        finally:
+            # Unblock signals
+            self.promptList.blockSignals(False)
 
 
 # Create a version that uses inheritance if UI class is available

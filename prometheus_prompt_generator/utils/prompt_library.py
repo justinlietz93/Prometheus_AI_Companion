@@ -286,17 +286,52 @@ class PromptLibrary:
         Returns:
             dict: The prompt data or default value
         """
+        result = None
+        
         # First try exact match
         if prompt_type in self.prompts:
-            return self.prompts[prompt_type]
+            result = self.prompts[prompt_type]
+        else:
+            # If not found, try case-insensitive search
+            for key in self.prompts:
+                if key.lower() == prompt_type.lower():
+                    result = self.prompts[key]
+                    break
         
-        # If not found, try case-insensitive search
-        for key in self.prompts:
-            if key.lower() == prompt_type.lower():
-                return self.prompts[key]
-                
         # If still not found, return default
-        return default or {}
+        if result is None:
+            return default or {}
+            
+        # Check if we need to convert from old format to new format
+        if "template" not in result and "prompts" in result:
+            # This is the old format with urgency levels
+            # Convert to new format by using the highest urgency level (10) as template
+            level_10 = "10"
+            if level_10 in result["prompts"]:
+                template = result["prompts"][level_10]
+            else:
+                # Use the highest available level
+                available_levels = list(result["prompts"].keys())
+                if available_levels:
+                    highest_level = max(available_levels, key=lambda x: int(x) if x.isdigit() else 0)
+                    template = result["prompts"][highest_level]
+                else:
+                    template = ""
+                    
+            # Create a new format prompt with the extracted template
+            new_format = {
+                "title": result.get("name", prompt_type).title() + " Prompt",
+                "description": result.get("description", ""),
+                "template": template,
+                "metadata": result.get("metadata", {})
+            }
+            
+            # Update in-memory cache for future calls
+            self.prompts[prompt_type] = new_format
+            
+            return new_format
+                
+        return result
     
     def get_types(self):
         """Return all prompt types.

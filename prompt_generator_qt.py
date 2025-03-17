@@ -16,7 +16,7 @@ from prometheus_prompt_generator.ui.metadata_dialog import MetadataDialog
 from prometheus_prompt_generator.utils.constants import (
     PROMETHEUS_BLUE, PROMETHEUS_LIGHT_BLUE, PROMETHEUS_DARK, PROMETHEUS_LIGHT, PROMETHEUS_ACCENT,
     DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE, DEFAULT_HEADING_SIZE,
-    AVAILABLE_THEMES, URGENCY_NAMES
+    AVAILABLE_THEMES, URGENCY_LEVELS
 )
 
 # Re-export the main function
